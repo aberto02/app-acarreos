@@ -433,29 +433,44 @@ function setFilter(btn){
 }
 function renderHistory(){
   const list=document.getElementById('historyList');
-  const ft=trips.filter(t=>inRange(t.date,currentFilter)).sort((a,b)=>b.date.localeCompare(a.date));
+
+  const ft=trips
+    .filter(t=>inRange(t.date,currentFilter))
+    .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+
   const fe=expenses.filter(e=>inRange(e.date,currentFilter));
-  const income=ft.reduce((s,t)=>s+Number(t.price),0);
-  const out=fe.reduce((s,e)=>s+Number(e.amount),0);
-  histIncome.textContent=money(income); histExpense.textContent=money(out); histProfit.textContent=money(income-out);
-    const gastosTipo={fuel:0,food:0,toll:0,platform:0,other:0};
 
-  fe.forEach(e=>{
-    const tipo=String(e.type||'').toLowerCase();
-    const monto=Number(e.amount||0);
+  const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
+  const out=fe.reduce((s,e)=>s+Number(e.amount||0),0);
 
-    if(tipo.includes('combust')){
-      gastosTipo.fuel+=monto;
-    }else if(tipo.includes('comida')){
-      gastosTipo.food+=monto;
-    }else if(tipo.includes('peaje')){
-      gastosTipo.toll+=monto;
-    }else if(tipo.includes('plataforma') || tipo.includes('indriver')){
-      gastosTipo.platform+=monto;
-    }else{
-      gastosTipo.other+=monto;
-    }
-  });
+  histIncome.textContent=money(income);
+  histExpense.textContent=money(out);
+  histProfit.textContent=money(income-out);
+
+  function sumarTipos(arr){
+    const g={fuel:0,food:0,toll:0,platform:0,other:0};
+
+    arr.forEach(e=>{
+      const tipo=String(e.type||'').toLowerCase();
+      const monto=Number(e.amount||0);
+
+      if(tipo.includes('combust')){
+        g.fuel+=monto;
+      }else if(tipo.includes('comida')){
+        g.food+=monto;
+      }else if(tipo.includes('peaje')){
+        g.toll+=monto;
+      }else if(tipo.includes('plataforma') || tipo.includes('indriver')){
+        g.platform+=monto;
+      }else{
+        g.other+=monto;
+      }
+    });
+
+    return g;
+  }
+
+  const gastosTipo=sumarTipos(fe);
 
   document.getElementById('histFuel').textContent=money(gastosTipo.fuel);
   document.getElementById('histFood').textContent=money(gastosTipo.food);
@@ -472,23 +487,148 @@ function renderHistory(){
   ].sort((a,b)=>b[1]-a[1])[0];
 
   document.getElementById('histTopExpense').textContent=
-    mayor && mayor[1]>0 ? mayor[0]+' '+money(mayor[1]) : 'Sin gastos';
-  if(!ft.length){ list.innerHTML='<div class="empty">Todavía no hay acarreos en este período.</div>'; return; }
-  list.innerHTML=ft.map(t=>{
-    const ge=tripExpenseTotal(t.id), profit=Number(t.price)-ge;
-    return `<div class="item">
-      <div class="item-head"><div><h3>${esc(t.from)} → ${esc(t.to)}</h3><div class="small">${esc(t.date)} · ${esc(t.client)}</div></div><span class="badge">${esc(t.cargo||'Acarreo')}</span></div>
-      <div class="row"><span>Cobrado</span><strong>${money(t.price)}</strong></div>
-      <div class="row"><span>Gastos ligados</span><strong class="danger">${money(ge)}</strong></div>
-      <div class="row"><span>Ganancia del viaje</span><strong class="success">${money(profit)}</strong></div>
-      <div class="row"><span>Kilómetros</span><strong>${t.km||0} km</strong></div>
-      <div class="toolbar" style="margin-top:10px">
-        <button class="btn-secondary" onclick="editTrip('${t.id}')">Editar</button>
-        <button class="btn-danger" onclick="deleteTrip('${t.id}')">Eliminar</button>
+    mayor && mayor[1]>0
+      ? mayor[0]+' '+money(mayor[1])
+      : 'Sin gastos';
+
+  const fechas=[...new Set([
+    ...ft.map(t=>String(t.date||'').slice(0,10)),
+    ...fe.map(e=>String(e.date||'').slice(0,10))
+  ].filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+
+  if(!fechas.length){
+    list.innerHTML='<div class="empty">Todavía no hay movimientos en este período.</div>';
+    return;
+  }
+
+  list.innerHTML=fechas.map(fecha=>{
+
+    const viajesDia=ft.filter(
+      t=>String(t.date||'').slice(0,10)===fecha
+    );
+
+    const gastosDia=fe.filter(
+      e=>String(e.date||'').slice(0,10)===fecha
+    );
+
+    const ingresoDia=viajesDia.reduce(
+      (s,t)=>s+Number(t.price||0),0
+          );
+
+    const gastoDia=gastosDia.reduce(
+      (s,e)=>s+Number(e.amount||0),0
+    );
+
+    const gananciaDia=ingresoDia-gastoDia;
+    const gd=sumarTipos(gastosDia);
+
+    const viajesHTML=viajesDia.length
+      ? viajesDia.map(t=>{
+
+        const ge=tripExpenseTotal(t.id);
+        const profit=Number(t.price||0)-ge;
+
+        return `
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+          <div class="item-head">
+            <div>
+              <h3>${esc(t.from)} → ${esc(t.to)}</h3>
+              <div class="small">${esc(t.client)}</div>
+            </div>
+            <span class="badge">${esc(t.cargo||'Acarreo')}</span>
+          </div>
+
+          <div class="row">
+            <span>Cobrado</span>
+            <strong>${money(t.price)}</strong>
+          </div>
+
+          <div class="row">
+            <span>Gastos ligados</span>
+            <strong class="danger">${money(ge)}</strong>
+          </div>
+
+          <div class="row">
+            <span>Ganancia del viaje</span>
+            <strong class="success">${money(profit)}</strong>
+          </div>
+
+          <div class="row">
+            <span>Kilómetros</span>
+            <strong>${t.km||0} km</strong>
+          </div>
+
+          <div class="toolbar" style="margin-top:10px">
+            <button class="btn-secondary" onclick="editTrip('${t.id}')">Editar</button>
+            <button class="btn-danger" onclick="deleteTrip('${t.id}')">Eliminar</button>
+          </div>
+        </div>`;
+      }).join('')
+      : '<div class="small" style="margin-top:12px">Sin acarreos registrados este día.</div>';
+
+    return `
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <h3>📅 ${esc(fecha)}</h3>
+          <div class="small">${viajesDia.length} acarreo${viajesDia.length===1?'':'s'} ese día</div>
+        </div>
+        <span class="badge">Resumen diario</span>
       </div>
+
+      <div class="row">
+        <span>Ingresos del día</span>
+        <strong>${money(ingresoDia)}</strong>
+      </div>
+
+      <div class="row">
+        <span>Gastos del día</span>
+        <strong class="danger">${money(gastoDia)}</strong>
+      </div>
+
+      <div class="row">
+        <span>Ganancia del día</span>
+        <strong class="success">${money(gananciaDia)}</strong>
+      </div>
+
+      <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
+        <div class="small" style="font-weight:800;margin-bottom:6px">GASTOS DEL DÍA</div>
+
+        <div class="row"><span>⛽ Combustible</span><strong>${money(gd.fuel)}</strong></div>
+        <div class="row"><span>🍽️ Comida</span><strong>${money(gd.food)}</strong></div>
+        <div class="row"><span>🛣️ Peaje</span><strong>${money(gd.toll)}</strong></div>
+        <div class="row"><span>📱 Plataformas</span><strong>${money(gd.platform)}</strong></div>
+        <div class="row"><span>📦 Otros</span><strong>${money(gd.other)}</strong></div>
+      </div>
+
+      ${viajesHTML}
     </div>`;
   }).join('');
 }
+  
+  
+
+  
+  
+  
+    
+
+  
+    
+  
+
+
+    
+
+    
+  
+      
+
+  
+
+
+  
+  
 function renderClients(){
   const q=(document.getElementById('clientSearch').value||'').toLowerCase();
   const map={};
