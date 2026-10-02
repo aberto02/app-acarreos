@@ -357,6 +357,41 @@ function renderHistory(){
   const income=ft.reduce((s,t)=>s+Number(t.price),0);
   const out=fe.reduce((s,e)=>s+Number(e.amount),0);
   histIncome.textContent=money(income); histExpense.textContent=money(out); histProfit.textContent=money(income-out);
+    const gastosTipo={fuel:0,food:0,toll:0,platform:0,other:0};
+
+  fe.forEach(e=>{
+    const tipo=String(e.type||'').toLowerCase();
+    const monto=Number(e.amount||0);
+
+    if(tipo.includes('combust')){
+      gastosTipo.fuel+=monto;
+    }else if(tipo.includes('comida')){
+      gastosTipo.food+=monto;
+    }else if(tipo.includes('peaje')){
+      gastosTipo.toll+=monto;
+    }else if(tipo.includes('plataforma') || tipo.includes('indriver')){
+      gastosTipo.platform+=monto;
+    }else{
+      gastosTipo.other+=monto;
+    }
+  });
+
+  document.getElementById('histFuel').textContent=money(gastosTipo.fuel);
+  document.getElementById('histFood').textContent=money(gastosTipo.food);
+  document.getElementById('histToll').textContent=money(gastosTipo.toll);
+  document.getElementById('histPlatform').textContent=money(gastosTipo.platform);
+  document.getElementById('histOther').textContent=money(gastosTipo.other);
+
+  const mayor=[
+    ['Combustible',gastosTipo.fuel],
+    ['Comida',gastosTipo.food],
+    ['Peaje',gastosTipo.toll],
+    ['Plataformas',gastosTipo.platform],
+    ['Otros',gastosTipo.other]
+  ].sort((a,b)=>b[1]-a[1])[0];
+
+  document.getElementById('histTopExpense').textContent=
+    mayor && mayor[1]>0 ? mayor[0]+' '+money(mayor[1]) : 'Sin gastos';
   if(!ft.length){ list.innerHTML='<div class="empty">Todavía no hay acarreos en este período.</div>'; return; }
   list.innerHTML=ft.map(t=>{
     const ge=tripExpenseTotal(t.id), profit=Number(t.price)-ge;
