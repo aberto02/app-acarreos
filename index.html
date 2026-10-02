@@ -1,214 +1,407 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mi Acarreo</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#172033; --muted:#6b7280;
+  --primary:#2563eb; --primary2:#1d4ed8; --success:#0f9d58; --danger:#dc2626;
+  --border:#e5e7eb; --shadow:0 6px 18px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{max-width:720px;margin:0 auto;min-height:100vh;padding-bottom:86px}
+header{padding:20px 16px 10px}
+header h1{margin:0;font-size:28px}
+header p{margin:4px 0 0;color:var(--muted)}
+main{padding:0 14px}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.kpi .label{font-size:13px;color:var(--muted);margin-bottom:6px}
+.kpi .value{font-size:24px;font-weight:800}
+.success{color:var(--success)} .danger{color:var(--danger)}
+.section-title{font-size:19px;margin:20px 0 10px}
+form{display:grid;gap:12px}
+label{font-weight:700;font-size:14px}
+input,select,textarea{
+  width:100%;margin-top:6px;padding:13px 12px;border:1px solid var(--border);
+  border-radius:12px;background:#fff;font-size:16px;color:var(--text)
+}
+textarea{min-height:88px;resize:vertical}
+button{
+  border:0;border-radius:13px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer
+}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:active{background:var(--primary2)}
+.btn-secondary{background:#eef2ff;color:#1e3a8a}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn-success{background:#dcfce7;color:#166534}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}
+.list{display:grid;gap:10px}
+.item{background:white;border:1px solid var(--border);border-radius:16px;padding:14px}
+.item-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.item h3{margin:0 0 4px;font-size:16px}
+.small{font-size:13px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:14px}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:700}
+.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.filters button{white-space:nowrap;background:white;border:1px solid var(--border);color:var(--text)}
+.filters button.active{background:var(--primary);color:white;border-color:var(--primary)}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+nav{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);
+  backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;justify-content:center;z-index:20
+}
+.nav-inner{width:min(720px,100%);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+.nav-btn{background:transparent;color:var(--muted);font-size:11px;padding:8px 2px}
+.nav-btn span{display:block;font-size:20px;margin-bottom:3px}
+.nav-btn.active{color:var(--primary)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:95px;background:#111827;color:white;padding:10px 14px;border-radius:999px;font-size:14px;display:none;z-index:50}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.toolbar button{flex:1;min-width:120px}
+.search{margin-bottom:12px}
+.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:13px}
+@media (max-width:430px){
+  .grid{grid-template-columns:1fr 1fr}
+  .kpi .value{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>🚚 Mi Acarreo</h1>
+  <p>Control de viajes, gastos, clientes y ganancias</p>
+</header>
 
-  <title>Mi Acarreo</title>
+<main>
+<section id="inicio" class="page active">
+  <div class="grid">
+    <div class="card kpi"><div class="label">Acarreos hoy</div><div class="value" id="kpiViajes">0</div></div>
+    <div class="card kpi"><div class="label">Ingresos hoy</div><div class="value" id="kpiIngresos">$0.00</div></div>
+    <div class="card kpi"><div class="label">Gastos hoy</div><div class="value danger" id="kpiGastos">$0.00</div></div>
+    <div class="card kpi"><div class="label">Ganancia hoy</div><div class="value success" id="kpiGanancia">$0.00</div></div>
+  </div>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <h2 class="section-title">Acciones rápidas</h2>
+  <div class="actions">
+    <button class="btn-primary" onclick="go('nuevo')">+ Nuevo acarreo</button>
+    <button class="btn-secondary" onclick="go('gastos')">+ Registrar gasto</button>
+    <button class="btn-secondary" onclick="go('historial')">Ver historial</button>
+    <button class="btn-secondary" onclick="go('clientes')">Ver clientes</button>
+  </div>
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-      padding-bottom: 90px;
-    }
+  <h2 class="section-title">Resumen del mes</h2>
+  <div class="card">
+    <div class="row"><span>Viajes</span><strong id="mesViajes">0</strong></div>
+    <div class="row"><span>Ingresos</span><strong id="mesIngresos">$0.00</strong></div>
+    <div class="row"><span>Gastos</span><strong id="mesGastos">$0.00</strong></div>
+    <div class="row"><span>Ganancia</span><strong class="success" id="mesGanancia">$0.00</strong></div>
+  </div>
 
-    header {
-      background: #111827;
-      color: white;
-      padding: 20px 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+  <h2 class="section-title">Respaldo</h2>
+  <div class="card">
+    <div class="note">Los datos se guardan en este dispositivo. Conviene exportar un respaldo regularmente.</div>
+    <div class="toolbar" style="margin-top:10px">
+      <button class="btn-success" onclick="exportData()">Exportar respaldo</button>
+      <button class="btn-secondary" onclick="document.getElementById('importFile').click()">Importar respaldo</button>
+      <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+</section>
 
-    header h1 {
-      font-size: 24px;
-    }
+<section id="nuevo" class="page">
+  <h2 class="section-title">Nuevo acarreo</h2>
+  <div class="card">
+    <form id="tripForm">
+      <label>Fecha
+        <input type="date" id="tripDate" required>
+      </label>
+      <label>Cliente
+        <input type="text" id="tripClient" placeholder="Nombre del cliente" required>
+      </label>
+      <label>Teléfono
+        <input type="tel" id="tripPhone" placeholder="Ej. 6000-0000">
+      </label>
+      <label>Lugar de recogida
+        <input type="text" id="tripFrom" placeholder="Ej. Pacora" required>
+      </label>
+      <label>Lugar de entrega
+        <input type="text" id="tripTo" placeholder="Ej. Metro Mall" required>
+      </label>
+      <label>Qué transportaste
+        <input type="text" id="tripCargo" placeholder="Ej. Tina, gavetero, mudanza">
+      </label>
+      <label>Precio cobrado ($)
+        <input type="number" id="tripPrice" min="0" step="0.01" required>
+      </label>
+      <label>Kilómetros
+        <input type="number" id="tripKm" min="0" step="0.1">
+      </label>
+      <label>Método de pago
+        <select id="tripPay">
+          <option>Efectivo</option>
+          <option>Yappy</option>
+          <option>Transferencia</option>
+          <option>Otro</option>
+        </select>
+      </label>
+      <label>Observaciones
+        <textarea id="tripNotes" placeholder="Notas del servicio"></textarea>
+      </label>
+      <button class="btn-primary" type="submit">Guardar acarreo</button>
+    </form>
+  </div>
+</section>
 
-    header p {
-      font-size: 13px;
-      opacity: 0.8;
-      margin-top: 4px;
-    }
+<section id="gastos" class="page">
+  <h2 class="section-title">Registrar gasto</h2>
+  <div class="card">
+    <form id="expenseForm">
+      <label>Fecha
+        <input type="date" id="expenseDate" required>
+      </label>
+      <label>Tipo de gasto
+        <select id="expenseType">
+          <option>Combustible</option>
+          <option>Peaje</option>
+          <option>Plataforma / InDriver</option>
+          <option>Comida</option>
+          <option>Mantenimiento</option>
+          <option>Cuota pickup</option>
+          <option>Otro</option>
+        </select>
+      </label>
+      <label>Monto ($)
+        <input type="number" id="expenseAmount" min="0" step="0.01" required>
+      </label>
+      <label>Relacionado con
+        <select id="expenseTrip">
+          <option value="">Gasto general</option>
+        </select>
+      </label>
+      <label>Nota
+        <textarea id="expenseNote" placeholder="Ej. combustible antes del viaje"></textarea>
+      </label>
+      <button class="btn-primary" type="submit">Guardar gasto</button>
+    </form>
+  </div>
+</section>
 
-    .contenedor {
-      max-width: 700px;
-      margin: auto;
-      padding: 16px;
-    }
+<section id="historial" class="page">
+  <h2 class="section-title">Historial</h2>
+  <div class="filters">
+    <button class="active" data-filter="all" onclick="setFilter(this)">Todo</button>
+    <button data-filter="today" onclick="setFilter(this)">Hoy</button>
+    <button data-filter="week" onclick="setFilter(this)">7 días</button>
+    <button data-filter="month" onclick="setFilter(this)">Mes</button>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div class="row"><span>Ingresos</span><strong id="histIncome">$0.00</strong></div>
+    <div class="row"><span>Gastos</span><strong id="histExpense">$0.00</strong></div>
+    <div class="row"><span>Ganancia</span><strong class="success" id="histProfit">$0.00</strong></div>
+  </div>
+  <div id="historyList" class="list" style="margin-top:12px"></div>
+</section>
 
-    .pantalla {
-      display: none;
-    }
+<section id="clientes" class="page">
+  <h2 class="section-title">Clientes</h2>
+  <input class="search" id="clientSearch" type="search" placeholder="Buscar cliente..." oninput="renderClients()">
+  <div id="clientList" class="list"></div>
+</section>
+</main>
+</div>
 
-    .pantalla.activa {
-      display: block;
-    }
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" data-page="inicio" onclick="go('inicio')"><span>🏠</span>Inicio</button>
+    <button class="nav-btn" data-page="nuevo" onclick="go('nuevo')"><span>➕</span>Acarreo</button>
+    <button class="nav-btn" data-page="gastos" onclick="go('gastos')"><span>💵</span>Gastos</button>
+    <button class="nav-btn" data-page="historial" onclick="go('historial')"><span>📒</span>Historial</button>
+    <button class="nav-btn" data-page="clientes" onclick="go('clientes')"><span>👥</span>Clientes</button>
+  </div>
+</nav>
 
-    .tarjeta {
-      background: white;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 15px;
-      box-shadow: 0 3px 10px rgba(0,0,0,.08);
-    }
+<div class="toast" id="toast"></div>
 
-    .tarjeta h2 {
-      font-size: 18px;
-      margin-bottom: 14px;
-    }
+<script>
+const KEY_TRIPS='miacarreo_trips_v1';
+const KEY_EXPENSES='miacarreo_expenses_v1';
+let trips = JSON.parse(localStorage.getItem(KEY_TRIPS) || '[]');
+let expenses = JSON.parse(localStorage.getItem(KEY_EXPENSES) || '[]');
+let currentFilter='all';
 
-    .resumen {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+function money(n){ return '$' + Number(n||0).toFixed(2); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function save(){
+  localStorage.setItem(KEY_TRIPS, JSON.stringify(trips));
+  localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
+}
+function toast(msg){
+  const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none',1800);
+}
+function go(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  if(page==='inicio') renderDashboard();
+  if(page==='gastos') populateTripOptions();
+  if(page==='historial') renderHistory();
+  if(page==='clientes') renderClients();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function dayStart(date){ return new Date(date+'T00:00:00'); }
+function inRange(date, type){
+  const d=dayStart(date), now=dayStart(todayStr());
+  if(type==='all') return true;
+  if(type==='today') return date===todayStr();
+  if(type==='week'){ const diff=(now-d)/86400000; return diff>=0 && diff<7; }
+  if(type==='month'){ return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth(); }
+  return true;
+}
+function tripExpenseTotal(tripId){
+  return expenses.filter(e=>e.tripId===tripId).reduce((s,e)=>s+Number(e.amount),0);
+}
+function renderDashboard(){
+  const td=todayStr();
+  const todayTrips=trips.filter(t=>t.date===td);
+  const todayExpenses=expenses.filter(e=>e.date===td);
+  const income=todayTrips.reduce((s,t)=>s+Number(t.price),0);
+  const out=todayExpenses.reduce((s,e)=>s+Number(e.amount),0);
+  document.getElementById('kpiViajes').textContent=todayTrips.length;
+  document.getElementById('kpiIngresos').textContent=money(income);
+  document.getElementById('kpiGastos').textContent=money(out);
+  document.getElementById('kpiGanancia').textContent=money(income-out);
 
-    .caja-resumen {
-      background: white;
-      border-radius: 15px;
-      padding: 16px;
-      box-shadow: 0 3px 8px rgba(0,0,0,.07);
-    }
-
-    .caja-resumen span {
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .caja-resumen strong {
-      display: block;
-      font-size: 22px;
-      margin-top: 5px;
-    }
-
-    .verde {
-      color: #16a34a;
-    }
-
-    .rojo {
-      color: #dc2626;
-    }
-
-    .azul {
-      color: #2563eb;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: bold;
-      margin-top: 12px;
-      margin-bottom: 5px;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 16px;
-      background: white;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .fila {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    button {
-      border: none;
-      border-radius: 11px;
-      padding: 13px 16px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .boton-principal {
-      width: 100%;
-      background: #16a34a;
-      color: white;
-      margin-top: 18px;
-    }
-
-    .boton-secundario {
-      width: 100%;
-      background: #2563eb;
-      color: white;
-      margin-top: 10px;
-    }
-
-    .boton-rojo {
-      background: #dc2626;
-      color: white;
-      padding: 8px 10px;
-      margin-top: 8px;
-    }
-
-    .registro {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 14px 0;
-    }
-
-    .registro:last-child {
-      border-bottom: none;
-    }
-
-    .registro h3 {
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-
-    .registro p {
-      font-size: 14px;
-      margin: 3px 0;
-      color: #4b5563;
-    }
-
-    .utilidad {
-      font-weight: bold;
-      color: #16a34a !important;
-    }
-
-    .perdida {
-      font-weight: bold;
-      color: #dc2626 !important;
-    }
-
-    .vacio {
-      text-align: center;
-      color: #6b7280;
-      padding: 30px 10px;
-    }
-
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      border-top: 1px solid #ddd;
-      display: flex;
-      justify-content: space-around;
-      z-index: 20;
-    }
-  
-    
+  const monthTrips=trips.filter(t=>inRange(t.date,'month'));
+  const monthExpenses=expenses.filter(e=>inRange(e.date,'month'));
+  const mi=monthTrips.reduce((s,t)=>s+Number(t.price),0);
+  const me=monthExpenses.reduce((s,e)=>s+Number(e.amount),0);
+  document.getElementById('mesViajes').textContent=monthTrips.length;
+  document.getElementById('mesIngresos').textContent=money(mi);
+  document.getElementById('mesGastos').textContent=money(me);
+  document.getElementById('mesGanancia').textContent=money(mi-me);
+}
+function populateTripOptions(){
+  const sel=document.getElementById('expenseTrip');
+  const current=sel.value;
+  sel.innerHTML='<option value="">Gasto general</option>';
+  [...trips].sort((a,b)=>b.date.localeCompare(a.date)).forEach(t=>{
+    const op=document.createElement('option');
+    op.value=t.id; op.textContent=`${t.date} · ${t.from} → ${t.to} · ${t.client}`;
+    sel.appendChild(op);
+  });
+  sel.value=current;
+}
+document.getElementById('tripForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const t={
+    id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    date:tripDate.value, client:tripClient.value.trim(), phone:tripPhone.value.trim(),
+    from:tripFrom.value.trim(), to:tripTo.value.trim(), cargo:tripCargo.value.trim(),
+    price:Number(tripPrice.value||0), km:Number(tripKm.value||0), pay:tripPay.value, notes:tripNotes.value.trim()
+  };
+  trips.push(t); save(); e.target.reset(); tripDate.value=todayStr(); toast('Acarreo guardado'); go('inicio');
+});
+document.getElementById('expenseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  expenses.push({
+    id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    date:expenseDate.value, type:expenseType.value, amount:Number(expenseAmount.value||0),
+    tripId:expenseTrip.value, note:expenseNote.value.trim()
+  });
+  save(); e.target.reset(); expenseDate.value=todayStr(); populateTripOptions(); toast('Gasto guardado'); go('inicio');
+});
+function setFilter(btn){
+  currentFilter=btn.dataset.filter;
+  document.querySelectorAll('.filters button').forEach(b=>b.classList.toggle('active',b===btn));
+  renderHistory();
+}
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  const ft=trips.filter(t=>inRange(t.date,currentFilter)).sort((a,b)=>b.date.localeCompare(a.date));
+  const fe=expenses.filter(e=>inRange(e.date,currentFilter));
+  const income=ft.reduce((s,t)=>s+Number(t.price),0);
+  const out=fe.reduce((s,e)=>s+Number(e.amount),0);
+  histIncome.textContent=money(income); histExpense.textContent=money(out); histProfit.textContent=money(income-out);
+  if(!ft.length){ list.innerHTML='<div class="empty">Todavía no hay acarreos en este período.</div>'; return; }
+  list.innerHTML=ft.map(t=>{
+    const ge=tripExpenseTotal(t.id), profit=Number(t.price)-ge;
+    return `<div class="item">
+      <div class="item-head"><div><h3>${esc(t.from)} → ${esc(t.to)}</h3><div class="small">${esc(t.date)} · ${esc(t.client)}</div></div><span class="badge">${esc(t.cargo||'Acarreo')}</span></div>
+      <div class="row"><span>Cobrado</span><strong>${money(t.price)}</strong></div>
+      <div class="row"><span>Gastos ligados</span><strong class="danger">${money(ge)}</strong></div>
+      <div class="row"><span>Ganancia del viaje</span><strong class="success">${money(profit)}</strong></div>
+      <div class="row"><span>Kilómetros</span><strong>${t.km||0} km</strong></div>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn-secondary" onclick="editTrip('${t.id}')">Editar</button>
+        <button class="btn-danger" onclick="deleteTrip('${t.id}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderClients(){
+  const q=(document.getElementById('clientSearch').value||'').toLowerCase();
+  const map={};
+  trips.forEach(t=>{
+    const key=(t.client||'Sin nombre').trim().toLowerCase();
+    if(!map[key]) map[key]={name:t.client||'Sin nombre',phone:t.phone||'',count:0,last:t.date,total:0};
+    map[key].count++; map[key].total+=Number(t.price);
+    if(t.date>map[key].last){map[key].last=t.date; if(t.phone) map[key].phone=t.phone;}
+  });
+  const arr=Object.values(map).filter(c=>c.name.toLowerCase().includes(q)).sort((a,b)=>b.last.localeCompare(a.last));
+  clientList.innerHTML=arr.length?arr.map(c=>`<div class="item">
+    <div class="item-head"><div><h3>${esc(c.name)}</h3><div class="small">${esc(c.phone||'Sin teléfono')}</div></div><span class="badge">${c.count} servicio${c.count===1?'':'s'}</span></div>
+    <div class="row"><span>Último servicio</span><strong>${esc(c.last)}</strong></div>
+    <div class="row"><span>Total cobrado</span><strong>${money(c.total)}</strong></div>
+    ${c.phone?`<div class="toolbar" style="margin-top:10px">
+      <button class="btn-secondary" onclick="location.href='tel:${encodeURIComponent(c.phone)}'">Llamar</button>
+      <button class="btn-success" onclick="window.open('https://wa.me/507${digits(c.phone)}','_blank')">WhatsApp</button>
+    </div>`:''}
+  </div>`).join(''):'<div class="empty">Todavía no hay clientes registrados.</div>';
+}
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function deleteTrip(id){
+  if(!confirm('¿Eliminar este acarreo?')) return;
+  trips=trips.filter(t=>t.id!==id);
+  expenses=expenses.filter(e=>e.tripId!==id);
+  save(); renderHistory(); toast('Acarreo eliminado');
+}
+function editTrip(id){
+  const t=trips.find(x=>x.id===id); if(!t) return;
+  const price=prompt('Nuevo precio cobrado:',t.price); if(price===null) return;
+  const km=prompt('Kilómetros:',t.km); if(km===null) return;
+  t.price=Number(price||0); t.km=Number(km||0); save(); renderHistory(); toast('Acarreo actualizado');
+}
+function exportData(){
+  const data={version:1,exportedAt:new Date().toISOString(),trips,expenses};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`mi-acarreo-respaldo-${todayStr()}.json`; a.click(); URL.revokeObjectURL(a.href);
+}
+function importData(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.trips)||!Array.isArray(d.expenses)) throw new Error();
+      trips=d.trips; expenses=d.expenses; save(); renderDashboard(); populateTripOptions(); toast('Respaldo importado');
+    }catch{ alert('Ese archivo no parece ser un respaldo válido de Mi Acarreo.'); }
+    ev.target.value='';
+  };
+  r.readAsText(file);
+}
+tripDate.value=todayStr();
+expenseDate.value=todayStr();
+renderDashboard();
+populateTripOptions();
+</script>
+</body>
+</html>
