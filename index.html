@@ -200,11 +200,30 @@ nav{
     <button data-filter="week" onclick="setFilter(this)">7 días</button>
     <button data-filter="month" onclick="setFilter(this)">Mes</button>
   </div>
-  <div class="card" style="margin-top:10px">
-    <div class="row"><span>Ingresos</span><strong id="histIncome">$0.00</strong></div>
-    <div class="row"><span>Gastos</span><strong id="histExpense">$0.00</strong></div>
-    <div class="row"><span>Ganancia</span><strong class="success" id="histProfit">$0.00</strong></div>
+ <div class="card" style="margin-top:10px">
+  <div class="row"><span>Ingresos</span><strong id="histIncome">$0.00</strong></div>
+  <div class="row"><span>Gastos totales</span><strong id="histExpense">$0.00</strong></div>
+  <div class="row"><span>Ganancia</span><strong class="success" id="histProfit">$0.00</strong></div>
+
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+    <div class="small" style="font-weight:800;margin-bottom:6px">GASTOS DEL PERÍODO</div>
+
+    <div class="row"><span>⛽ Combustible</span><strong id="histFuel">$0.00</strong></div>
+    <div class="row"><span>🍽️ Comida</span><strong id="histFood">$0.00</strong></div>
+    <div class="row"><span>🛣️ Peaje</span><strong id="histToll">$0.00</strong></div>
+    <div class="row"><span>📱 Plataformas</span><strong id="histPlatform">$0.00</strong></div>
+    <div class="row"><span>📦 Otros</span><strong id="histOther">$0.00</strong></div>
+
+    <div class="row" style="margin-top:12px;padding-top:8px;border-top:1px dashed var(--border)">
+      <span>Mayor gasto</span>
+      <strong class="danger" id="histTopExpense">Sin gastos</strong>
+    </div>
   </div>
+</div> 
+
+  
+
+
   <div id="historyList" class="list" style="margin-top:12px"></div>
 </section>
 
