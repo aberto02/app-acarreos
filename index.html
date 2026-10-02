@@ -268,24 +268,33 @@ function tripExpenseTotal(tripId){
   return expenses.filter(e=>e.tripId===tripId).reduce((s,e)=>s+Number(e.amount),0);
 }
 function renderDashboard(){
-  const td=todayStr();
-  const todayTrips=trips.filter(t=>t.date===td);
-  const todayExpenses=expenses.filter(e=>e.date===td);
-  const income=todayTrips.reduce((s,t)=>s+Number(t.price),0);
-  const out=todayExpenses.reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('kpiViajes').textContent=todayTrips.length;
-  document.getElementById('kpiIngresos').textContent=money(income);
-  document.getElementById('kpiGastos').textContent=money(out);
-  document.getElementById('kpiGanancia').textContent=money(income-out);
+  const now = new Date();
+  const td = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const monthKey = td.slice(0, 7);
 
-  const monthTrips=trips.filter(t=>inRange(t.date,'month'));
-  const monthExpenses=expenses.filter(e=>inRange(e.date,'month'));
-  const mi=monthTrips.reduce((s,t)=>s+Number(t.price),0);
-  const me=monthExpenses.reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('mesViajes').textContent=monthTrips.length;
-  document.getElementById('mesIngresos').textContent=money(mi);
-  document.getElementById('mesGastos').textContent=money(me);
-  document.getElementById('mesGanancia').textContent=money(mi-me);
+  const sameDay = (d) => String(d || '').slice(0, 10) === td;
+  const sameMonth = (d) => String(d || '').slice(0, 7) === monthKey;
+  const getAmount = (x) => Number(x.amount ?? x.price ?? x.total ?? 0);
+
+  const todayTrips = trips.filter(t => sameDay(t.date));
+  const todayExpenses = expenses.filter(e => sameDay(e.date));
+  const income = todayTrips.reduce((s, t) => s + getAmount(t), 0);
+  const out = todayExpenses.reduce((s, e) => s + getAmount(e), 0);
+
+  document.getElementById('kpiViajes').textContent = todayTrips.length;
+  document.getElementById('kpiIngresos').textContent = '$' + income.toFixed(2);
+  document.getElementById('kpiGastos').textContent = '$' + out.toFixed(2);
+  document.getElementById('kpiGanancia').textContent = '$' + (income - out).toFixed(2);
+
+  const monthTrips = trips.filter(t => sameMonth(t.date));
+  const monthExpenses = expenses.filter(e => sameMonth(e.date));
+  const mi = monthTrips.reduce((s, t) => s + getAmount(t), 0);
+  const me = monthExpenses.reduce((s, e) => s + getAmount(e), 0);
+
+  document.getElementById('mesViajes').textContent = monthTrips.length;
+  document.getElementById('mesIngresos').textContent = '$' + mi.toFixed(2);
+  document.getElementById('mesGastos').textContent = '$' + me.toFixed(2);
+  document.getElementById('mesGanancia').textContent = '$' + (mi - me).toFixed(2);
 }
 function populateTripOptions(){
   const sel=document.getElementById('expenseTrip');
