@@ -745,9 +745,30 @@ const kmTotalPeriodo=fo.reduce((total,r)=>{
 document.getElementById('histKmTotal').textContent=
   kmTotalPeriodo.toLocaleString()+' km';
 
+const fechasConKm=new Set(
+  fo.filter(r=>{
+    const inicio=Number(r.startKm);
+    const final=recordFinalKm(r);
+
+    return (
+      Number.isFinite(inicio) &&
+      inicio>0 &&
+      final!==null &&
+      final>=inicio
+    );
+  }).map(r=>String(r.date||'').slice(0,10))
+);
+
+const combustibleConKm=fe
+  .filter(e =>
+    fechasConKm.has(String(e.date||'').slice(0,10)) &&
+    String(e.type||'').toLowerCase().includes('combust')
+  )
+  .reduce((s,e)=>s+Number(e.amount||0),0);
+
 document.getElementById('histFuelPerKm').textContent=
-  kmTotalPeriodo>0 && gastosTipo.fuel>0
-    ? money(gastosTipo.fuel/kmTotalPeriodo)+'/km'
+  kmTotalPeriodo>0 && combustibleConKm>0
+    ? money(combustibleConKm/kmTotalPeriodo)+'/km'
     : '—';
   document.getElementById('histFuel').textContent=money(gastosTipo.fuel);
   document.getElementById('histFood').textContent=money(gastosTipo.food);
