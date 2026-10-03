@@ -681,7 +681,7 @@ function renderHistory(){
     .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
 
   const fe=expenses.filter(e=>inRange(e.date,currentFilter));
-
+const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
   const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
   const out=fe.reduce((s,e)=>s+Number(e.amount||0),0);
 
@@ -734,10 +734,10 @@ function renderHistory(){
       : 'Sin gastos';
 
   const fechas=[...new Set([
-    ...ft.map(t=>String(t.date||'').slice(0,10)),
-    ...fe.map(e=>String(e.date||'').slice(0,10))
-  ].filter(Boolean))].sort((a,b)=>b.localeCompare(a));
-
+  ...ft.map(t=>String(t.date||'').slice(0,10)),
+  ...fe.map(e=>String(e.date||'').slice(0,10)),
+  ...fo.map(r=>String(r.date||'').slice(0,10))
+].filter(Boolean))].sort((a,b)=>b.localeCompare(a));
   if(!fechas.length){
     list.innerHTML='<div class="empty">Todavía no hay movimientos en este período.</div>';
     return;
@@ -764,6 +764,29 @@ function renderHistory(){
     const gananciaDia=ingresoDia-gastoDia;
     const gd=sumarTipos(gastosDia);
 
+    const odoDia=fo.find(
+  r=>String(r.date||'').slice(0,10)===fecha
+);
+
+const kmInicialDia=
+  odoDia && Number(odoDia.startKm)>0
+    ? Number(odoDia.startKm)
+    : null;
+
+const kmFinalDia=
+  odoDia ? recordFinalKm(odoDia) : null;
+
+const kmRecorridoDia=
+  kmInicialDia!==null &&
+  kmFinalDia!==null &&
+  kmFinalDia>=kmInicialDia
+    ? kmFinalDia-kmInicialDia
+    : 0;
+
+const costoDieselKmDia=
+  kmRecorridoDia>0 && gd.fuel>0
+    ? gd.fuel/kmRecorridoDia
+    : null;
     const viajesHTML=viajesDia.length
       ? viajesDia.map(t=>{
 
@@ -832,7 +855,34 @@ function renderHistory(){
         <span>Ganancia del día</span>
         <strong class="success">${money(gananciaDia)}</strong>
       </div>
+<div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
+  <div class="small" style="font-weight:800;margin-bottom:6px">KILOMETRAJE DEL DÍA</div>
 
+  <div class="row">
+    <span>Km inicial</span>
+    <strong>${kmInicialDia!==null ? kmInicialDia.toLocaleString()+' km' : '—'}</strong>
+  </div>
+
+  <div class="row">
+    <span>Km final</span>
+    <strong>${kmFinalDia!==null ? kmFinalDia.toLocaleString()+' km' : '—'}</strong>
+  </div>
+
+  <div class="row">
+    <span>Km recorrido</span>
+    <strong>${kmRecorridoDia.toLocaleString()} km</strong>
+  </div>
+
+  <div class="row">
+    <span>⛽ Diésel</span>
+    <strong>${money(gd.fuel)}</strong>
+  </div>
+
+  <div class="row">
+    <span>Costo diésel/km</span>
+    <strong>${costoDieselKmDia!==null ? money(costoDieselKmDia)+'/km' : '—'}</strong>
+  </div>
+</div>
       <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
         <div class="small" style="font-weight:800;margin-bottom:6px">GASTOS DEL DÍA</div>
 
