@@ -89,6 +89,73 @@ button{
     box-shadow:0 0 0 10px rgba(220,38,38,.55);
   }
 }
+.history-drawer{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.history-drawer summary,
+.trip-drawer summary{
+  list-style:none;
+  cursor:pointer;
+}
+
+.history-drawer summary::-webkit-details-marker,
+.trip-drawer summary::-webkit-details-marker{
+  display:none;
+}
+
+.drawer-summary{
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.drawer-main{
+  min-width:0;
+}
+
+.drawer-title{
+  font-weight:800;
+  font-size:16px;
+}
+
+.drawer-numbers{
+  margin-top:4px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.drawer-arrow{
+  font-size:18px;
+  transition:transform .2s ease;
+}
+
+.history-drawer[open] > summary .drawer-arrow,
+.trip-drawer[open] > summary .drawer-arrow{
+  transform:rotate(180deg);
+}
+
+.drawer-body{
+  padding:0 14px 14px;
+  border-top:1px solid var(--border);
+}
+
+.trip-drawer{
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.trip-drawer summary{
+  padding:11px 12px;
+  background:#f8fafc;
+}
   .filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
 .filters button{white-space:nowrap;background:white;border:1px solid var(--border);color:var(--text)}
 .filters button.active{background:var(--primary);color:white;border-color:var(--primary)}
@@ -1045,113 +1112,144 @@ const costoDieselKmDia=
     ? gd.fuel/kmRecorridoDia
     : null;
     const viajesHTML=viajesDia.length
-      ? viajesDia.map(t=>{
+  ? viajesDia.map((t,index)=>{
 
-        const ge=tripExpenseTotal(t.id);
-        const profit=Number(t.price||0)-ge;
-
-        return `
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-          <div class="item-head">
-            <div>
-              <h3>${esc(t.from)} → ${esc(t.to)}</h3>
-              <div class="small">${esc(t.client)}</div>
-            </div>
-            <span class="badge">${esc(t.cargo||'Acarreo')}</span>
-          </div>
-
-          <div class="row">
-            <span>Cobrado</span>
-            <strong>${money(t.price)}</strong>
-          </div>
-
-          <div class="row">
-            <span>Gastos ligados</span>
-            <strong class="danger">${money(ge)}</strong>
-          </div>
-
-          <div class="row">
-            <span>Ganancia del viaje</span>
-            <strong class="success">${money(profit)}</strong>
-          </div>
-
-          <div class="row">
-            <span>Kilómetros</span>
-            <strong>${t.km||0} km</strong>
-          </div>
-
-          <div class="toolbar" style="margin-top:10px">
-            <button class="btn-secondary" onclick="editTrip('${t.id}')">Editar</button>
-            <button class="btn-danger" onclick="deleteTrip('${t.id}')">Eliminar</button>
-          </div>
-        </div>`;
-      }).join('')
-      : '<div class="small" style="margin-top:12px">Sin acarreos registrados este día.</div>';
+    const ge=tripExpenseTotal(t.id);
+    const profit=Number(t.price||0)-ge;
 
     return `
-    <div class="item">
-      <div class="item-head">
-        <div>
-          <h3>📅 ${esc(fecha)}</h3>
-          <div class="small">${viajesDia.length} acarreo${viajesDia.length===1?'':'s'} ese día</div>
+    <details class="trip-drawer">
+      <summary>
+        <div class="drawer-summary" style="padding:0">
+          <div class="drawer-main">
+            <div class="drawer-title">🚚 Acarreo ${index+1}</div>
+            <div class="drawer-numbers">
+              ${esc(t.from)} → ${esc(t.to)} · ${money(t.price)}
+            </div>
+          </div>
+
+          <span class="drawer-arrow">⌄</span>
         </div>
-        <span class="badge">Resumen diario</span>
+      </summary>
+
+      <div class="drawer-body">
+        <div class="row">
+          <span>Cliente</span>
+          <strong>${esc(t.client||'—')}</strong>
+        </div>
+
+        <div class="row">
+          <span>Cobrado</span>
+          <strong>${money(t.price)}</strong>
+        </div>
+
+        <div class="row">
+          <span>Gastos ligados</span>
+          <strong class="danger">${money(ge)}</strong>
+        </div>
+
+        <div class="row">
+          <span>Ganancia</span>
+          <strong class="success">${money(profit)}</strong>
+        </div>
+
+        <div class="row">
+          <span>Kilómetros</span>
+          <strong>${t.km||0} km</strong>
+        </div>
+
+        <div class="toolbar" style="margin-top:10px">
+          <button class="btn-secondary" onclick="editTrip('${t.id}')">Editar</button>
+          <button class="btn-danger" onclick="deleteTrip('${t.id}')">Eliminar</button>
+        </div>
+      </div>
+    </details>`;
+  }).join('')
+  : '<div class="small" style="margin-top:12px">Sin acarreos registrados este día.</div>';
+
+    return `
+<details class="history-drawer">
+  <summary>
+    <div class="drawer-summary">
+      <div class="drawer-main">
+        <div class="drawer-title">📅 ${esc(fecha)}</div>
+
+        <div class="drawer-numbers">
+          ${viajesDia.length} acarreo${viajesDia.length===1?'':'s'}
+          · Ingresos ${money(ingresoDia)}
+          · Gastos ${money(gastoDia)}
+          · Ganancia ${money(gananciaDia)}
+        </div>
+      </div>
+
+      <span class="drawer-arrow">⌄</span>
+    </div>
+  </summary>
+
+  <div class="drawer-body">
+
+    <div class="row">
+      <span>Ingresos del día</span>
+      <strong>${money(ingresoDia)}</strong>
+    </div>
+
+    <div class="row">
+      <span>Gastos del día</span>
+      <strong class="danger">${money(gastoDia)}</strong>
+    </div>
+
+    <div class="row">
+      <span>Ganancia del día</span>
+      <strong class="success">${money(gananciaDia)}</strong>
+    </div>
+
+    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
+      <div class="small" style="font-weight:800;margin-bottom:6px">
+        KILOMETRAJE DEL DÍA
       </div>
 
       <div class="row">
-        <span>Ingresos del día</span>
-        <strong>${money(ingresoDia)}</strong>
+        <span>Km inicial</span>
+        <strong>${kmInicialDia!==null ? kmInicialDia.toLocaleString()+' km' : '—'}</strong>
       </div>
 
       <div class="row">
-        <span>Gastos del día</span>
-        <strong class="danger">${money(gastoDia)}</strong>
+        <span>Km final</span>
+        <strong>${kmFinalDia!==null ? kmFinalDia.toLocaleString()+' km' : '—'}</strong>
       </div>
 
       <div class="row">
-        <span>Ganancia del día</span>
-        <strong class="success">${money(gananciaDia)}</strong>
-      </div>
-<div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
-  <div class="small" style="font-weight:800;margin-bottom:6px">KILOMETRAJE DEL DÍA</div>
-
-  <div class="row">
-    <span>Km inicial</span>
-    <strong>${kmInicialDia!==null ? kmInicialDia.toLocaleString()+' km' : '—'}</strong>
-  </div>
-
-  <div class="row">
-    <span>Km final</span>
-    <strong>${kmFinalDia!==null ? kmFinalDia.toLocaleString()+' km' : '—'}</strong>
-  </div>
-
-  <div class="row">
-    <span>Km recorrido</span>
-    <strong>${kmRecorridoDia.toLocaleString()} km</strong>
-  </div>
-
-  <div class="row">
-    <span>⛽ Diésel</span>
-    <strong>${money(gd.fuel)}</strong>
-  </div>
-
-  <div class="row">
-    <span>Costo diésel/km</span>
-    <strong>${costoDieselKmDia!==null ? money(costoDieselKmDia)+'/km' : '—'}</strong>
-  </div>
-</div>
-      <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
-        <div class="small" style="font-weight:800;margin-bottom:6px">GASTOS DEL DÍA</div>
-
-        <div class="row"><span>⛽ Combustible</span><strong>${money(gd.fuel)}</strong></div>
-        <div class="row"><span>🍽️ Comida</span><strong>${money(gd.food)}</strong></div>
-        <div class="row"><span>🛣️ Peaje</span><strong>${money(gd.toll)}</strong></div>
-        <div class="row"><span>📱 Plataformas</span><strong>${money(gd.platform)}</strong></div>
-        <div class="row"><span>📦 Otros</span><strong>${money(gd.other)}</strong></div>
+        <span>Km recorrido</span>
+        <strong>${kmRecorridoDia.toLocaleString()} km</strong>
       </div>
 
-      ${viajesHTML}
-    </div>`;
+      <div class="row">
+        <span>⛽ Diésel</span>
+        <strong>${money(gd.fuel)}</strong>
+      </div>
+
+      <div class="row">
+        <span>Costo diésel/km</span>
+        <strong>${costoDieselKmDia!==null ? money(costoDieselKmDia)+'/km' : '—'}</strong>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
+      <div class="small" style="font-weight:800;margin-bottom:6px">
+        GASTOS DEL DÍA
+      </div>
+
+      <div class="row"><span>⛽ Combustible</span><strong>${money(gd.fuel)}</strong></div>
+      <div class="row"><span>🍽️ Comida</span><strong>${money(gd.food)}</strong></div>
+      <div class="row"><span>🛣️ Peaje</span><strong>${money(gd.toll)}</strong></div>
+      <div class="row"><span>📱 Plataformas</span><strong>${money(gd.platform)}</strong></div>
+      <div class="row"><span>📦 Otros</span><strong>${money(gd.other)}</strong></div>
+    </div>
+
+    ${viajesHTML}
+
+  </div>
+</details>`;
   }).join('');
 }
   
