@@ -104,10 +104,9 @@ nav{
     <strong id="odoTodayKm">0 km</strong>
   </div>
 
-  <div class="row">
-    <span>Odómetro actual</span>
-    <strong id="odoCurrentKm">0 km</strong>
-  </div>
+  
+  
+    
 </div>
   <div class="grid">
     <div class="card kpi"><div class="label">Acarreos hoy</div><div class="value" id="kpiViajes">0</div></div>
@@ -286,7 +285,10 @@ let expenses = JSON.parse(localStorage.getItem(KEY_EXPENSES) || '[]');
 let currentFilter='all';
 
 function money(n){ return '$' + Number(n||0).toFixed(2); }
-function todayStr(){ return new Date().toISOString().slice(0,10); }
+function todayStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 function save(){
   localStorage.setItem(KEY_TRIPS, JSON.stringify(trips));
   localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
@@ -312,8 +314,9 @@ function save(){
   document.getElementById('odoTodayKm').textContent=
     kmToday.toLocaleString()+' km';
 
-  document.getElementById('odoCurrentKm').textContent=
-    latest ? Number(latest.km).toLocaleString()+' km' : '0 km';
+  document.getElementById('odoKm').value=
+  latest ? Number(latest.km) : '';
+    
 
   document.getElementById('odoLatest').textContent=
     latest ? latest.date : 'Sin registro';
