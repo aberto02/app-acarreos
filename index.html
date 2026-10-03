@@ -48,7 +48,48 @@ button{
 .small{font-size:13px;color:var(--muted)}
 .row{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:14px}
 .badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:700}
-.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+#maintStatus.maint-yellow{
+  background:#fef3c7;
+  color:#92400e;
+  animation:maintPulseYellow 1.5s infinite;
+}
+
+#maintStatus.maint-yellow-medium{
+  background:#fde68a;
+  color:#92400e;
+  animation:maintPulseYellow 1s infinite;
+}
+
+#maintStatus.maint-yellow-fast{
+  background:#facc15;
+  color:#713f12;
+  animation:maintPulseYellow .6s infinite;
+}
+
+#maintStatus.maint-red{
+  background:#fee2e2;
+  color:#991b1b;
+  animation:maintPulseRed .5s infinite;
+}
+
+@keyframes maintPulseYellow{
+  0%,100%{
+    box-shadow:0 0 0 0 rgba(250,204,21,.2);
+  }
+  50%{
+    box-shadow:0 0 0 8px rgba(250,204,21,.45);
+  }
+}
+
+@keyframes maintPulseRed{
+  0%,100%{
+    box-shadow:0 0 0 0 rgba(220,38,38,.25);
+  }
+  50%{
+    box-shadow:0 0 0 10px rgba(220,38,38,.55);
+  }
+}
+  .filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
 .filters button{white-space:nowrap;background:white;border:1px solid var(--border);color:var(--text)}
 .filters button.active{background:var(--primary);color:white;border-color:var(--primary)}
 .empty{padding:24px;text-align:center;color:var(--muted)}
@@ -410,6 +451,7 @@ function renderMaintenance(){
   const nextEl=document.getElementById('maintNextKm');
   const remainingEl=document.getElementById('maintRemainingKm');
 
+ status.className='badge';
   if(!lastInput || !intervalInput) return;
 
   const lastKm=Number(maintenance.lastKm||0);
@@ -430,27 +472,44 @@ function renderMaintenance(){
   const remaining=nextKm-currentKm;
 
   nextEl.textContent=nextKm.toLocaleString()+' km';
+if(currentKm<=0){
+  status.textContent='Sin km actual';
+  remainingEl.textContent='—';
 
-  if(currentKm<=0){
-    status.textContent='Sin km actual';
-    remainingEl.textContent='—';
-  }else if(remaining<0){
-    status.textContent='⚠️ Cambio vencido';
-    remainingEl.textContent=
-      'Vencido por '+Math.abs(remaining).toLocaleString()+' km';
-  }else if(remaining===0){
-    status.textContent='⚠️ Cambio ahora';
-    remainingEl.textContent='0 km';
-  }else if(remaining<=500){
-    status.textContent='⚠️ Próximo';
-    remainingEl.textContent=
-      remaining.toLocaleString()+' km';
-  }else{
-    status.textContent='Al día';
-    remainingEl.textContent=
-      remaining.toLocaleString()+' km';
-  }
+}else if(remaining<=0){
+  status.classList.add('maint-red');
+  status.textContent='🔴 CAMBIO YA';
+
+  remainingEl.textContent=
+    remaining<0
+      ? 'Vencido por '+Math.abs(remaining).toLocaleString()+' km'
+      : '0 km';
+
+}else if(remaining<=200){
+  status.classList.add('maint-yellow-fast');
+  status.textContent='🟡 Muy cerca';
+  remainingEl.textContent=
+    remaining.toLocaleString()+' km';
+
+}else if(remaining<=500){
+  status.classList.add('maint-yellow-medium');
+  status.textContent='🟡 Próximo';
+  remainingEl.textContent=
+    remaining.toLocaleString()+' km';
+
+}else if(remaining<=1000){
+  status.classList.add('maint-yellow');
+  status.textContent='🟡 Acercándose';
+  remainingEl.textContent=
+    remaining.toLocaleString()+' km';
+
+}else{
+  status.textContent='✅ Al día';
+  remainingEl.textContent=
+    remaining.toLocaleString()+' km';
 }
+  }
+
 
 function saveMaintenance(){
   const lastKm=Number(
