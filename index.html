@@ -320,7 +320,8 @@ function save(){
 
   document.getElementById('odoKm').value=
   latest ? Number(latest.km) : '';
-    
+  document.getElementById('odoStartKm').textContent=
+  previous ? Number(previous.km).toLocaleString()+' km' : '0 km';  
 
   document.getElementById('odoLatest').textContent=
     latest ? latest.date : 'Sin registro';
