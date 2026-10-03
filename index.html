@@ -1319,6 +1319,71 @@ function editTrip(id){
   const km=prompt('Kilómetros:',t.km); if(km===null) return;
   t.price=Number(price||0); t.km=Number(km||0); save(); renderHistory(); toast('Acarreo actualizado');
 }
+  function editDayDate(oldDate){
+  const newDate = prompt(
+    'Escribe la nueva fecha (AAAA-MM-DD):',
+    oldDate
+  );
+
+  if(newDate === null) return;
+
+  const fecha = newDate.trim();
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)){
+    alert('Fecha inválida. Usa AAAA-MM-DD');
+    return;
+  }
+
+  trips.forEach(t=>{
+    if(String(t.date||'').slice(0,10) === oldDate){
+      t.date = fecha;
+    }
+  });
+
+  expenses.forEach(e=>{
+    if(String(e.date||'').slice(0,10) === oldDate){
+      e.date = fecha;
+    }
+  });
+
+  odometerRecords.forEach(r=>{
+    if(String(r.date||'').slice(0,10) === oldDate){
+      r.date = fecha;
+    }
+  });
+
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
+
+  toast('Fecha actualizada');
+}
+
+function deleteDay(fecha){
+  if(!confirm(
+    '¿Eliminar todos los registros del día ' + fecha + '?'
+  )) return;
+
+  trips = trips.filter(
+    t => String(t.date||'').slice(0,10) !== fecha
+  );
+
+  expenses = expenses.filter(
+    e => String(e.date||'').slice(0,10) !== fecha
+  );
+
+  odometerRecords = odometerRecords.filter(
+    r => String(r.date||'').slice(0,10) !== fecha
+  );
+
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
+
+  toast('Día eliminado');
+}
 function exportData(){
   const data={version:1,exportedAt:new Date().toISOString(),trips,expenses};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
