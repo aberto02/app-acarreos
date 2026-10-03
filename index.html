@@ -245,6 +245,19 @@ nav{
   <div class="row"><span>Ganancia</span><strong class="success" id="histProfit">$0.00</strong></div>
 
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+  <div class="small" style="font-weight:800;margin-bottom:6px">KILOMETRAJE DEL PERÍODO</div>
+
+  <div class="row">
+    <span>Km recorridos</span>
+    <strong id="histKmTotal">0 km</strong>
+  </div>
+
+  <div class="row">
+    <span>Costo diésel/km</span>
+    <strong id="histFuelPerKm">—</strong>
+  </div>
+</div>
+   <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
     <div class="small" style="font-weight:800;margin-bottom:6px">GASTOS DEL PERÍODO</div>
 
     <div class="row"><span>⛽ Combustible</span><strong id="histFuel">$0.00</strong></div>
@@ -713,7 +726,29 @@ const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),curren
   }
 
   const gastosTipo=sumarTipos(fe);
+const kmTotalPeriodo=fo.reduce((total,r)=>{
+  const inicio=Number(r.startKm);
+  const final=recordFinalKm(r);
 
+  if(
+    Number.isFinite(inicio) &&
+    inicio>0 &&
+    final!==null &&
+    final>=inicio
+  ){
+    return total+(final-inicio);
+  }
+
+  return total;
+},0);
+
+document.getElementById('histKmTotal').textContent=
+  kmTotalPeriodo.toLocaleString()+' km';
+
+document.getElementById('histFuelPerKm').textContent=
+  kmTotalPeriodo>0 && gastosTipo.fuel>0
+    ? money(gastosTipo.fuel/kmTotalPeriodo)+'/km'
+    : '—';
   document.getElementById('histFuel').textContent=money(gastosTipo.fuel);
   document.getElementById('histFood').textContent=money(gastosTipo.food);
   document.getElementById('histToll').textContent=money(gastosTipo.toll);
