@@ -291,6 +291,7 @@ function save(){
   localStorage.setItem(KEY_TRIPS, JSON.stringify(trips));
   localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
   localStorage.setItem(KEY_ODOMETER, JSON.stringify(odometerRecords));
+  }
   function renderOdometer(){
   const latest=[...odometerRecords]
     .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
