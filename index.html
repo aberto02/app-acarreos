@@ -89,20 +89,23 @@ nav{
     <span class="badge" id="odoLatest">Sin registro</span>
   </div>
 
-  <label>Kilometraje actual del carro
-    <input type="number" id="odoKm" min="0" step="1" placeholder="Ej. 125430">
-  </label>
+<div class="row">
+  <span>Km inicial</span>
+  <strong id="odoStartKm">0 km</strong>
+</div>
 
-  <button class="btn-primary"
-          style="width:100%;margin-top:10px"
-          onclick="saveOdometer()">
-    Guardar kilometraje
-  </button>
+<label>Km final
+  <input type="number" id="odoKm" min="0" step="1">
+</label>
 
-  <div class="row">
-    <span>🚗 Rodado hoy</span>
-    <strong id="odoTodayKm">0 km</strong>
-  </div>
+<button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveOdometer()">
+  Guardar
+</button>
+
+<div class="row">
+  <span>Km recorrido</span>
+  <strong id="odoTodayKm">0 km</strong>
+</div>
 
   
   
