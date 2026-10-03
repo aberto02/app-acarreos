@@ -119,6 +119,37 @@ nav{
   
     
 </div>
+ <div class="card" style="margin-bottom:12px">
+  <div class="item-head">
+    <div>
+      <h3 style="margin:0">🛠️ Mantenimiento</h3>
+      <div class="small">Control de cambio de aceite</div>
+    </div>
+    <span class="badge" id="maintStatus">Sin configurar</span>
+  </div>
+
+  <label>Km del último cambio de aceite
+    <input type="number" id="maintLastKm" min="0" step="1" placeholder="Ej. 205000">
+  </label>
+
+  <label>Cambiar cada
+    <input type="number" id="maintIntervalKm" min="1" step="1" placeholder="Ej. 5000">
+  </label>
+
+  <button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveMaintenance()">
+    Guardar mantenimiento
+  </button>
+
+  <div class="row">
+    <span>Próximo cambio</span>
+    <strong id="maintNextKm">—</strong>
+  </div>
+
+  <div class="row">
+    <span>Faltan</span>
+    <strong id="maintRemainingKm">—</strong>
+  </div>
+</div>
   <div class="grid">
     <div class="card kpi"><div class="label">Acarreos hoy</div><div class="value" id="kpiViajes">0</div></div>
     <div class="card kpi"><div class="label">Ingresos hoy</div><div class="value" id="kpiIngresos">$0.00</div></div>
@@ -303,7 +334,9 @@ nav{
 const KEY_TRIPS='miacarreo_trips_v1';
 const KEY_EXPENSES='miacarreo_expenses_v1';
   const KEY_ODOMETER='miacarreo_odometer_v1';
-let odometerRecords = JSON.parse(localStorage.getItem(KEY_ODOMETER) || '[]');
+const KEY_MAINTENANCE='miacarreo_maintenance_v1';
+let maintenance=JSON.parse(localStorage.getItem(KEY_MAINTENANCE) || '{"lastKm":0,"intervalKm":0}');
+  let odometerRecords = JSON.parse(localStorage.getItem(KEY_ODOMETER) || '[]');
 let trips = JSON.parse(localStorage.getItem(KEY_TRIPS) || '[]');
 let expenses = JSON.parse(localStorage.getItem(KEY_EXPENSES) || '[]');
 let currentFilter='all';
@@ -322,7 +355,8 @@ function save(){
   localStorage.setItem(KEY_TRIPS, JSON.stringify(trips));
   localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
   localStorage.setItem(KEY_ODOMETER, JSON.stringify(odometerRecords));
-  }
+ localStorage.setItem(KEY_MAINTENANCE, JSON.stringify(maintenance));
+}
 
 function recordFinalKm(r){
   if(!r) return null;
@@ -339,7 +373,114 @@ function recordFinalKm(r){
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function getPreviousOdometerRecord(date){
+function getCurrentVehicleKm(){
+  const today=todayStr();
+
+  const todayRecord=odometerRecords.find(
+    r=>String(r.date||'')===today
+  );
+
+  if(todayRecord){
+    const finalKm=recordFinalKm(todayRecord);
+
+    if(finalKm!==null){
+      return finalKm;
+    }
+
+    const startKm=Number(todayRecord.startKm);
+
+    if(Number.isFinite(startKm) && startKm>0){
+      return startKm;
+    }
+  }
+
+  const latest=[...odometerRecords]
+    .filter(r=>recordFinalKm(r)!==null)
+    .sort((a,b)=>
+      String(b.date||'').localeCompare(String(a.date||''))
+    )[0];
+
+  return latest ? recordFinalKm(latest) : 0;
+}
+
+function renderMaintenance(){
+  const lastInput=document.getElementById('maintLastKm');
+  const intervalInput=document.getElementById('maintIntervalKm');
+  const status=document.getElementById('maintStatus');
+  const nextEl=document.getElementById('maintNextKm');
+  const remainingEl=document.getElementById('maintRemainingKm');
+
+  if(!lastInput || !intervalInput) return;
+
+  const lastKm=Number(maintenance.lastKm||0);
+  const intervalKm=Number(maintenance.intervalKm||0);
+
+  lastInput.value=lastKm>0 ? lastKm : '';
+  intervalInput.value=intervalKm>0 ? intervalKm : '';
+
+  if(lastKm<=0 || intervalKm<=0){
+    status.textContent='Sin configurar';
+    nextEl.textContent='—';
+    remainingEl.textContent='—';
+    return;
+  }
+
+  const nextKm=lastKm+intervalKm;
+  const currentKm=getCurrentVehicleKm();
+  const remaining=nextKm-currentKm;
+
+  nextEl.textContent=nextKm.toLocaleString()+' km';
+
+  if(currentKm<=0){
+    status.textContent='Sin km actual';
+    remainingEl.textContent='—';
+  }else if(remaining<0){
+    status.textContent='⚠️ Cambio vencido';
+    remainingEl.textContent=
+      'Vencido por '+Math.abs(remaining).toLocaleString()+' km';
+  }else if(remaining===0){
+    status.textContent='⚠️ Cambio ahora';
+    remainingEl.textContent='0 km';
+  }else if(remaining<=500){
+    status.textContent='⚠️ Próximo';
+    remainingEl.textContent=
+      remaining.toLocaleString()+' km';
+  }else{
+    status.textContent='Al día';
+    remainingEl.textContent=
+      remaining.toLocaleString()+' km';
+  }
+}
+
+function saveMaintenance(){
+  const lastKm=Number(
+    document.getElementById('maintLastKm').value
+  );
+
+  const intervalKm=Number(
+    document.getElementById('maintIntervalKm').value
+  );
+
+  if(!Number.isFinite(lastKm) || lastKm<=0){
+    toast('Escribe el km del último cambio');
+    return;
+  }
+
+  if(!Number.isFinite(intervalKm) || intervalKm<=0){
+    toast('Escribe cada cuántos km se cambia');
+    return;
+  }
+
+  maintenance={
+    lastKm:lastKm,
+    intervalKm:intervalKm
+  };
+
+  save();
+  renderMaintenance();
+  toast('Mantenimiento guardado');
+}
+  function getPreviousOdometerRecord(date){
   return [...odometerRecords]
     .filter(r =>
       String(r.date || '') < date &&
@@ -417,6 +558,7 @@ document.getElementById('odoFuelPerKm').textContent =
     : '—';
   startInput.oninput = updateOdometerPreview;
   finalInput.oninput = updateOdometerPreview;
+renderMaintenance();
 }
 
 function updateOdometerPreview(){
