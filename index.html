@@ -84,7 +84,7 @@ nav{
   <div class="item-head">
     <div>
       <h3 style="margin:0">🚘 Kilometraje diario</h3>
-      <div class="small">Registra el odómetro una vez al día</div>
+      <div class="small">Registra al salir y al regresar</div>
     </div>
     <span class="badge" id="odoLatest">Sin registro</span>
   </div>
@@ -105,6 +105,15 @@ nav{
   <span>Km recorrido</span>
   <strong id="odoTodayKm">0 km</strong>
 </div> 
+    <div class="row">
+  <span>⛽ Diésel hoy</span>
+  <strong id="odoFuelToday">$0.00</strong>
+</div>
+
+<div class="row">
+  <span>Costo diésel/km</span>
+  <strong id="odoFuelPerKm">—</strong>
+</div>
 
   
   
@@ -376,7 +385,22 @@ function renderOdometer(){
 
   document.getElementById('odoTodayKm').textContent =
     recorrido.toLocaleString() + ' km';
+const dieselHoy = expenses
+.filter(e =>
+  String(e.date || '').slice(0,10) === today &&
+  String(e.type || '')
+    .toLowerCase()
+    .includes('combust')
+)
+  .reduce((s,e) => s + Number(e.amount || 0), 0);
 
+document.getElementById('odoFuelToday').textContent =
+  money(dieselHoy);
+
+document.getElementById('odoFuelPerKm').textContent =
+  recorrido > 0 && dieselHoy > 0
+    ? money(dieselHoy / recorrido) + '/km'
+    : '—';
   startInput.oninput = updateOdometerPreview;
   finalInput.oninput = updateOdometerPreview;
 }
@@ -485,7 +509,7 @@ function go(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(page).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-  if(page==='inicio') renderDashboard();
+  if(page==='inicio'){ renderDashboard(); renderOdometer(); }
   if(page==='gastos') populateTripOptions();
   if(page==='historial') renderHistory();
   if(page==='clientes') renderClients();
