@@ -80,6 +80,35 @@ nav{
 
 <main>
 <section id="inicio" class="page active">
+  <div class="card" style="margin-bottom:12px">
+  <div class="item-head">
+    <div>
+      <h3 style="margin:0">🚘 Kilometraje diario</h3>
+      <div class="small">Registra el odómetro una vez al día</div>
+    </div>
+    <span class="badge" id="odoLatest">Sin registro</span>
+  </div>
+
+  <label>Kilometraje actual del carro
+    <input type="number" id="odoKm" min="0" step="1" placeholder="Ej. 125430">
+  </label>
+
+  <button class="btn-primary"
+          style="width:100%;margin-top:10px"
+          onclick="saveOdometer()">
+    Guardar kilometraje
+  </button>
+
+  <div class="row">
+    <span>🚗 Rodado hoy</span>
+    <strong id="odoTodayKm">0 km</strong>
+  </div>
+
+  <div class="row">
+    <span>Odómetro actual</span>
+    <strong id="odoCurrentKm">0 km</strong>
+  </div>
+</div>
   <div class="grid">
     <div class="card kpi"><div class="label">Acarreos hoy</div><div class="value" id="kpiViajes">0</div></div>
     <div class="card kpi"><div class="label">Ingresos hoy</div><div class="value" id="kpiIngresos">$0.00</div></div>
@@ -250,6 +279,8 @@ nav{
 <script>
 const KEY_TRIPS='miacarreo_trips_v1';
 const KEY_EXPENSES='miacarreo_expenses_v1';
+  const KEY_ODOMETER='miacarreo_odometer_v1';
+let odometerRecords = JSON.parse(localStorage.getItem(KEY_ODOMETER) || '[]');
 let trips = JSON.parse(localStorage.getItem(KEY_TRIPS) || '[]');
 let expenses = JSON.parse(localStorage.getItem(KEY_EXPENSES) || '[]');
 let currentFilter='all';
@@ -259,7 +290,68 @@ function todayStr(){ return new Date().toISOString().slice(0,10); }
 function save(){
   localStorage.setItem(KEY_TRIPS, JSON.stringify(trips));
   localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
+  localStorage.setItem(KEY_ODOMETER, JSON.stringify(odometerRecords));
+  function renderOdometer(){
+  const latest=[...odometerRecords]
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+
+  const today=todayStr();
+  const todayRecord=odometerRecords.find(r=>r.date===today);
+
+  const previous=[...odometerRecords]
+    .filter(r=>r.date<today)
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+
+  let kmToday=0;
+
+  if(todayRecord && previous){
+    kmToday=Math.max(0,Number(todayRecord.km)-Number(previous.km));
+  }
+
+  document.getElementById('odoTodayKm').textContent=
+    kmToday.toLocaleString()+' km';
+
+  document.getElementById('odoCurrentKm').textContent=
+    latest ? Number(latest.km).toLocaleString()+' km' : '0 km';
+
+  document.getElementById('odoLatest').textContent=
+    latest ? latest.date : 'Sin registro';
 }
+
+function saveOdometer(){
+  const input=document.getElementById('odoKm');
+  const km=Number(input.value);
+
+  if(!km || km<=0){
+    toast('Escribe el kilometraje actual');
+    return;
+  }
+
+  const today=todayStr();
+
+  const previous=[...odometerRecords]
+    .filter(r=>r.date<today)
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+
+  if(previous && km<Number(previous.km)){
+    alert('El kilometraje no puede ser menor al registro anterior.');
+    return;
+  }
+
+  const existing=odometerRecords.find(r=>r.date===today);
+
+  if(existing){
+    existing.km=km;
+  }else{
+    odometerRecords.push({date:today,km:km});
+  }
+
+  save();
+  input.value='';
+  renderOdometer();
+  toast('Kilometraje guardado');
+}
+
 function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block';
   setTimeout(()=>el.style.display='none',1800);
@@ -685,6 +777,7 @@ function importData(ev){
 tripDate.value=todayStr();
 expenseDate.value=todayStr();
 renderDashboard();
+  renderOdometer();
 populateTripOptions();
 </script>
 </body>
