@@ -89,13 +89,12 @@ nav{
     <span class="badge" id="odoLatest">Sin registro</span>
   </div>
 
-<div class="row">
-  <span>Km inicial</span>
-  <strong id="odoStartKm">0 km</strong>
-</div>
+   <label>Km inicial
+  <input type="number" id="odoStartKmInput" min="0" step="1" placeholder="Ej. 209500">
+</label>
 
 <label>Km final
-  <input type="number" id="odoKm" min="0" step="1">
+  <input type="number" id="odoFinalKmInput" min="0" step="1" placeholder="Al regresar">
 </label>
 
 <button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveOdometer()">
@@ -105,7 +104,7 @@ nav{
 <div class="row">
   <span>Km recorrido</span>
   <strong id="odoTodayKm">0 km</strong>
-</div>
+</div> 
 
   
   
@@ -301,109 +300,183 @@ function save(){
   localStorage.setItem(KEY_EXPENSES, JSON.stringify(expenses));
   localStorage.setItem(KEY_ODOMETER, JSON.stringify(odometerRecords));
   }
+
+function recordFinalKm(r){
+  if(!r) return null;
+
+  const value =
+    r.finalKm !== undefined &&
+    r.finalKm !== null &&
+    r.finalKm !== ''
+      ? r.finalKm
+      : r.km;
+
+  const n = Number(value);
+
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 function getPreviousOdometerRecord(date){
   return [...odometerRecords]
-    .filter(r=>String(r.date||'')<date && Number.isFinite(Number(r.km)))
-    .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+    .filter(r =>
+      String(r.date || '') < date &&
+      recordFinalKm(r) !== null
+    )
+    .sort((a,b) =>
+      String(b.date || '').localeCompare(String(a.date || ''))
+    )[0];
 }
 
 function renderOdometer(){
-  const today=todayStr();
-  const todayRecord=odometerRecords.find(
-    r=>String(r.date||'')===today
+  const today = todayStr();
+
+  const todayRecord = odometerRecords.find(
+    r => String(r.date || '') === today
   );
 
-  const previous=getPreviousOdometerRecord(today);
+  const previous = getPreviousOdometerRecord(today);
 
-  const startKm=previous
-    ? Number(previous.km)
-    : (todayRecord ? Number(todayRecord.km) : 0);
+  let startKm = null;
+  let finalKm = null;
 
-  const finalKm=todayRecord
-    ? Number(todayRecord.km)
-    : null;
+  if(todayRecord){
+    if(Number(todayRecord.startKm) > 0){
+      startKm = Number(todayRecord.startKm);
+    }else if(previous){
+      startKm = recordFinalKm(previous);
+    }
 
-  let kmToday=0;
-
-  if(previous && finalKm!==null){
-    kmToday=Math.max(
-      0,
-      finalKm-Number(previous.km)
-    );
+    finalKm = recordFinalKm(todayRecord);
   }
 
-  document.getElementById('odoLatest').textContent=today;
+  const startInput =
+    document.getElementById('odoStartKmInput');
 
-  document.getElementById('odoStartKm').textContent=
-    startKm.toLocaleString()+' km';
+  const finalInput =
+    document.getElementById('odoFinalKmInput');
 
-  const input=document.getElementById('odoKm');
+  startInput.value =
+    startKm !== null ? startKm : '';
 
-  input.value=
-    finalKm!==null ? finalKm : '';
+  finalInput.value =
+    finalKm !== null ? finalKm : '';
 
-  document.getElementById('odoTodayKm').textContent=
-    kmToday.toLocaleString()+' km';
+  let recorrido = 0;
 
-  input.oninput=updateOdometerPreview;
+  if(
+    startKm !== null &&
+    finalKm !== null &&
+    finalKm >= startKm
+  ){
+    recorrido = finalKm - startKm;
+  }
+
+  document.getElementById('odoLatest').textContent =
+    today;
+
+  document.getElementById('odoTodayKm').textContent =
+    recorrido.toLocaleString() + ' km';
+
+  startInput.oninput = updateOdometerPreview;
+  finalInput.oninput = updateOdometerPreview;
 }
 
 function updateOdometerPreview(){
-  const today=todayStr();
-  const previous=getPreviousOdometerRecord(today);
+  const startRaw =
+    document.getElementById('odoStartKmInput').value;
 
-  const km=Number(
-    document.getElementById('odoKm').value
-  );
+  const finalRaw =
+    document.getElementById('odoFinalKmInput').value;
 
-  let recorrido=0;
+  const startKm =
+    startRaw === '' ? null : Number(startRaw);
 
-  if(previous && Number.isFinite(km) && km>0){
-    recorrido=Math.max(
-      0,
-      km-Number(previous.km)
-    );
+  const finalKm =
+    finalRaw === '' ? null : Number(finalRaw);
+
+  let recorrido = 0;
+
+  if(
+    Number.isFinite(startKm) &&
+    startKm > 0 &&
+    Number.isFinite(finalKm) &&
+    finalKm >= startKm
+  ){
+    recorrido = finalKm - startKm;
   }
 
-  document.getElementById('odoTodayKm').textContent=
-    recorrido.toLocaleString()+' km';
+  document.getElementById('odoTodayKm').textContent =
+    recorrido.toLocaleString() + ' km';
 }
 
 function saveOdometer(){
-  const input=document.getElementById('odoKm');
-  const km=Number(input.value);
+  const startRaw =
+    document.getElementById('odoStartKmInput').value;
 
-  if(!Number.isFinite(km) || km<=0){
-    toast('Escribe el kilometraje final');
+  const finalRaw =
+    document.getElementById('odoFinalKmInput').value;
+
+  const startKm = Number(startRaw);
+
+  const finalKm =
+    finalRaw === '' ? null : Number(finalRaw);
+
+  if(!Number.isFinite(startKm) || startKm <= 0){
+    toast('Escribe el km inicial');
     return;
   }
 
-  const today=todayStr();
-  const previous=getPreviousOdometerRecord(today);
-
-  if(previous && km<Number(previous.km)){
-    alert('El kilometraje final no puede ser menor al inicial.');
+  if(
+    finalKm !== null &&
+    (!Number.isFinite(finalKm) || finalKm <= 0)
+  ){
+    toast('Revisa el km final');
     return;
   }
 
-  const existing=odometerRecords.find(
-    r=>String(r.date||'')===today
+  if(finalKm !== null && finalKm < startKm){
+    alert(
+      'El kilometraje final no puede ser menor al inicial.'
+    );
+    return;
+  }
+
+  const today = todayStr();
+
+  let existing = odometerRecords.find(
+    r => String(r.date || '') === today
   );
 
   if(existing){
-    existing.km=km;
+    existing.startKm = startKm;
+
+    if(finalKm !== null){
+      existing.finalKm = finalKm;
+      existing.km = finalKm;
+    }
   }else{
-    odometerRecords.push({
-      date:today,
-      km:km
-    });
+    existing = {
+      date: today,
+      startKm: startKm,
+      finalKm: finalKm
+    };
+
+    if(finalKm !== null){
+      existing.km = finalKm;
+    }
+
+    odometerRecords.push(existing);
   }
 
   save();
   renderOdometer();
-  toast('Kilometraje guardado');
-}
 
+  if(finalKm === null){
+    toast('Km inicial guardado');
+  }else{
+    toast('Kilometraje del día guardado');
+  }
+}
 function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block';
   setTimeout(()=>el.style.display='none',1800);
