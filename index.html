@@ -295,6 +295,7 @@ let trips = JSON.parse(localStorage.getItem(KEY_TRIPS) || '[]');
 let expenses = JSON.parse(localStorage.getItem(KEY_EXPENSES) || '[]');
 let currentFilter='all';
 
+  let editingExpenseId='';
 function money(n){ return '$' + Number(n||0).toFixed(2); }
 function todayStr(){
   const d=new Date();
