@@ -404,35 +404,107 @@ nav{
 </section>
 
 <section id="gastos" class="page">
-  <h2 class="section-title">Registrar gasto</h2>
+  <h2 class="section-title">Gastos del día</h2>
+
   <div class="card">
     <form id="expenseForm">
+
       <label>Fecha
         <input type="date" id="expenseDate" required>
       </label>
-      <label>Tipo de gasto
-        <select id="expenseType">
-          <option>Combustible</option>
-          <option>Peaje</option>
-          <option>Plataforma / InDriver</option>
-          <option>Comida</option>
-          <option>Mantenimiento</option>
-          <option>Cuota pickup</option>
-          <option>Otro</option>
-        </select>
-      </label>
-      <label>Monto ($)
-        <input type="number" id="expenseAmount" min="0" step="0.01" required>
-      </label>
-      <label>Relacionado con
+
+      <div class="grid" style="margin-top:10px">
+
+        <label>⛽ Combustible
+          <input type="number"
+            id="expenseFuel"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label>🍽️ Comida
+          <input type="number"
+            id="expenseFood"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label>🛣️ Corredor / Peaje
+          <input type="number"
+            id="expenseToll"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label>📱 Plataforma
+          <input type="number"
+            id="expensePlatform"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label>🔧 Mantenimiento
+          <input type="number"
+            id="expenseMaintenance"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label>🚙 Cuota pickup
+          <input type="number"
+            id="expensePickup"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+        <label class="full">📦 Otros
+          <input type="number"
+            id="expenseOther"
+            min="0"
+            step="0.01"
+            placeholder="$0.00"
+            oninput="updateExpenseBatchTotal()">
+        </label>
+
+      </div>
+
+      <div class="row"
+        style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+        <span><strong>Total gastos</strong></span>
+        <strong class="danger" id="expenseBatchTotal">$0.00</strong>
+      </div>
+
+      <label style="margin-top:12px">Relacionado con
         <select id="expenseTrip">
-          <option value="">Gasto general</option>
+          <option value="">Gasto general del día</option>
         </select>
       </label>
-      <label>Nota
-        <textarea id="expenseNote" placeholder="Ej. combustible antes del viaje"></textarea>
+
+      <label>Nota general
+        <textarea
+          id="expenseNote"
+          placeholder="Opcional"></textarea>
       </label>
-      <button class="btn-primary" type="submit">Guardar gasto</button>
+
+      <button
+        class="btn-primary"
+        type="submit"
+        style="width:100%">
+        💾 Guardar gastos del día
+      </button>
+
     </form>
   </div>
 </section>
