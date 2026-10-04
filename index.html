@@ -1259,122 +1259,106 @@ function addBatchTrip(){
   refreshTripSuggestions();
 }
 
-function removeBatchTrip(btn){
-  const items=document.querySelectorAll(
-    '#tripBatchList .trip-batch-item'
-  );
+toast(
+  nuevos.length +
+  (nuevos.length===1
+    ? ' acarreo guardado'
+    : ' acarreos guardados')
+);
+});
 
-  if(items.length===1){
-    toast('Debe quedar al menos un acarreo');
-    return;
-  }
+function updateExpenseBatchTotal(){
 
-  btn.closest('.trip-batch-item').remove();
-  renumberBatchTrips();
-}
-
-document.getElementById('tripForm').addEventListener('submit',e=>{
-  e.preventDefault();
-
-  const fecha=document.getElementById('tripDate').value;
-
-  const items=[
-    ...document.querySelectorAll(
-      '#tripBatchList .trip-batch-item'
-    )
+  const ids=[
+    'expenseFuel',
+    'expenseFood',
+    'expenseToll',
+    'expensePlatform',
+    'expenseMaintenance',
+    'expensePickup',
+    'expenseOther'
   ];
 
-  const nuevos=items.map(item=>({
-    id:crypto.randomUUID
-      ? crypto.randomUUID()
-      : String(Date.now()+Math.random()),
-
-    date:fecha,
-
-    client:item
-      .querySelector('.batch-client')
-      .value.trim(),
-
-    phone:item
-      .querySelector('.batch-phone')
-      .value.trim(),
-
-    from:item
-      .querySelector('.batch-from')
-      .value.trim(),
-
-    to:item
-      .querySelector('.batch-to')
-      .value.trim(),
-
-    cargo:item
-      .querySelector('.batch-cargo')
-      .value.trim(),
-
-    price:Number(
-      item.querySelector('.batch-price').value||0
-    ),
-
-    km:Number(
-      item.querySelector('.batch-km').value||0
-    ),
-
-    pay:item.querySelector('.batch-pay').value,
-
-    notes:item
-      .querySelector('.batch-notes')
-      .value.trim()
-  }));
-
-  trips.push(...nuevos);
-
-  save();
-  renderDashboard();
-  populateTripOptions();
-
-  document.getElementById('tripBatchList').innerHTML='';
-  addBatchTrip();
-
-  document.getElementById('tripDate').value=fecha;
-
-  toast(
-    nuevos.length +
-    (nuevos.length===1
-      ? ' acarreo guardado'
-      : ' acarreos guardados')
+  const total=ids.reduce((s,id)=>
+    s+Number(document.getElementById(id).value||0),0
   );
-});
+
+  document.getElementById('expenseBatchTotal').textContent=
+    money(total);
+}
+
 document.getElementById('expenseForm').addEventListener('submit',e=>{
   e.preventDefault();
 
-  const data={
-    date:expenseDate.value,
-    type:expenseType.value,
-    amount:Number(expenseAmount.value||0),
-    tripId:expenseTrip.value,
-    note:expenseNote.value.trim()
-  };
+  const fecha=expenseDate.value;
+  const tripId=expenseTrip.value;
+  const note=expenseNote.value.trim();
 
-  if(editingExpenseId){
-    const gasto=expenses.find(x=>String(x.id)===String(editingExpenseId));
-    if(gasto) Object.assign(gasto,data);
-    editingExpenseId='';
-    toast('Gasto actualizado');
-  }else{
-    expenses.push({
-      id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      ...data
-    });
-    toast('Gasto guardado');
+  const datos=[
+    ['Combustible','expenseFuel'],
+    ['Comida','expenseFood'],
+    ['Corredor / Peaje','expenseToll'],
+    ['Plataforma / InDriver','expensePlatform'],
+    ['Mantenimiento','expenseMaintenance'],
+    ['Cuota pickup','expensePickup'],
+    ['Otro','expenseOther']
+  ];
+
+  const nuevos=[];
+
+  datos.forEach(([type,id])=>{
+    const amount=Number(
+      document.getElementById(id).value||0
+    );
+
+    if(amount>0){
+      nuevos.push({
+        id:crypto.randomUUID
+          ? crypto.randomUUID()
+          : String(Date.now()+Math.random()),
+        date:fecha,
+        type,
+        amount,
+        tripId,
+        note
+      });
+    }
+  });
+
+  if(!nuevos.length){
+    toast('Escribe al menos un gasto');
+    return;
   }
 
+  expenses.push(...nuevos);
+
   save();
-  e.target.reset();
-  expenseDate.value=todayStr();
-  populateTripOptions();
-  renderExpenses();
   renderDashboard();
+  populateTripOptions();
+
+  [
+    'expenseFuel',
+    'expenseFood',
+    'expenseToll',
+    'expensePlatform',
+    'expenseMaintenance',
+    'expensePickup',
+    'expenseOther'
+  ].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+
+  expenseNote.value='';
+  updateExpenseBatchTotal();
+
+  toast(
+    nuevos.length===1
+      ? 'Gasto guardado'
+      : nuevos.length+' gastos guardados'
+  );
 });
+
+    
 
 function renderExpenses(){
   const list=document.getElementById('expenseList');
