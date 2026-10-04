@@ -52,8 +52,98 @@ button{
   background:#fef3c7;
   color:#92400e;
   animation:maintPulseYellow 1.5s infinite;
+function updateExpenseBatchTotal(){
+
+  const ids=[
+    'expenseFuel',
+    'expenseFood',
+    'expenseToll',
+    'expensePlatform',
+    'expenseMaintenance',
+    'expensePickup',
+    'expenseOther'
+  ];
+
+  const total=ids.reduce((s,id)=>
+    s+Number(document.getElementById(id).value||0),0
+  );
+
+  document.getElementById('expenseBatchTotal').textContent=
+    money(total);
 }
 
+document.getElementById('expenseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  const fecha=expenseDate.value;
+  const tripId=expenseTrip.value;
+  const note=expenseNote.value.trim();
+
+  const datos=[
+    ['Combustible','expenseFuel'],
+    ['Comida','expenseFood'],
+    ['Corredor / Peaje','expenseToll'],
+    ['Plataforma / InDriver','expensePlatform'],
+    ['Mantenimiento','expenseMaintenance'],
+    ['Cuota pickup','expensePickup'],
+    ['Otro','expenseOther']
+  ];
+
+  const nuevos=[];
+
+  datos.forEach(([type,id])=>{
+
+    const amount=
+      Number(document.getElementById(id).value||0);
+
+    if(amount>0){
+      nuevos.push({
+        id:crypto.randomUUID
+          ? crypto.randomUUID()
+          : String(Date.now()+Math.random()),
+        date:fecha,
+        type,
+        amount,
+        tripId,
+        note
+      });
+    }
+
+  });
+
+  if(!nuevos.length){
+    toast('Escribe al menos un gasto');
+    return;
+  }
+
+  expenses.push(...nuevos);
+
+  save();
+  renderDashboard();
+  populateTripOptions();
+
+  [
+    'expenseFuel',
+    'expenseFood',
+    'expenseToll',
+    'expensePlatform',
+    'expenseMaintenance',
+    'expensePickup',
+    'expenseOther'
+  ].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+
+  expenseNote.value='';
+
+  updateExpenseBatchTotal();
+
+  toast(
+    nuevos.length===1
+      ? 'Gasto guardado'
+      : nuevos.length+' gastos guardados'
+  );
+});
 #maintStatus.maint-yellow-medium{
   background:#fde68a;
   color:#92400e;
