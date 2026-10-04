@@ -156,27 +156,48 @@ document.getElementById('expenseForm').addEventListener('submit',e=>{
   animation:maintPulseYellow .6s infinite;
 }
 
-#maintStatus.maint-red{
-  background:#fee2e2;
-  color:#991b1b;
-  animation:maintPulseRed .5s infinite;
+  #maintStatus.maint-red{
+  background:#fecaca;
+  color:#7f1d1d;
+  border:2px solid #ef4444;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-weight:900;
+  animation:maintPulseRed .65s ease-in-out infinite;
 }
 
-@keyframes maintPulseYellow{
-  0%,100%{
-    box-shadow:0 0 0 0 rgba(250,204,21,.2);
-  }
-  50%{
-    box-shadow:0 0 0 8px rgba(250,204,21,.45);
-  }
+#maintStatus.maint-red::before{
+  content:'';
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:#ff0000;
+  flex:none;
+  animation:maintRedLight .55s ease-in-out infinite;
 }
 
 @keyframes maintPulseRed{
   0%,100%{
-    box-shadow:0 0 0 0 rgba(220,38,38,.25);
+    transform:scale(1);
+    box-shadow:0 0 0 0 rgba(255,0,0,.25);
   }
   50%{
-    box-shadow:0 0 0 10px rgba(220,38,38,.55);
+    transform:scale(1.06);
+    box-shadow:0 0 0 10px rgba(255,0,0,.35);
+  }
+}
+
+@keyframes maintRedLight{
+  0%,100%{
+    background:#b91c1c;
+    box-shadow:0 0 4px rgba(255,0,0,.5);
+  }
+  50%{
+    background:#ff0000;
+    box-shadow:
+      0 0 8px #ff0000,
+      0 0 16px rgba(255,0,0,.9);
   }
 }
 .history-drawer{
@@ -774,7 +795,7 @@ if(currentKm<=0){
 
 }else if(remaining<=0){
   status.classList.add('maint-red');
-  status.textContent='🔴 CAMBIO YA';
+  status.textContent='CAMBIO YA';
 
   remainingEl.textContent=
     remaining<0
