@@ -1200,7 +1200,7 @@ const costoDieselKmDia=
 
     <div class="row">
       <span>Ganancia del día</span>
-      <strong class="success">${money(gananciaDia)}</strong>
+      <strong class="${gananciaDia < 0 ? 'danger' : 'success'}">${money(gananciaDia)}</strong>
     </div>
     <div class="toolbar" style="margin-top:12px">
   <button class="btn-secondary" onclick="editDay('${fecha}')">
