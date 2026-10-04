@@ -1402,10 +1402,23 @@ function editDay(oldDate){
 
   toast('Día actualizado');
 
-  if(confirm('¿Quieres agregar un gasto a este día?')){
-    go('gastos');
-    expenseDate.value = fecha;
-  }
+const opcion = prompt(
+  '¿Qué quieres hacer ahora?\n\n' +
+  '1 = Agregar gasto\n' +
+  '2 = Agregar acarreo\n' +
+  '3 = Terminar',
+  '3'
+);
+
+if(opcion === '1'){
+  go('gastos');
+  expenseDate.value = fecha;
+}
+
+if(opcion === '2'){
+  go('nuevo');
+  tripDate.value = fecha;
+}
 }
 function deleteDay(fecha){
   if(!confirm(
