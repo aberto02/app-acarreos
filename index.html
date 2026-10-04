@@ -293,45 +293,112 @@ nav{
 </section>
 
 <section id="nuevo" class="page">
-  <h2 class="section-title">Nuevo acarreo</h2>
+  <h2 class="section-title">Acarreos del día</h2>
+
   <div class="card">
     <form id="tripForm">
-      <label>Fecha
+
+      <label>Fecha del día
         <input type="date" id="tripDate" required>
       </label>
-      <label>Cliente
-        <input type="text" id="tripClient" placeholder="Nombre del cliente" required>
-      </label>
-      <label>Teléfono
-        <input type="tel" id="tripPhone" placeholder="Ej. 6000-0000">
-      </label>
-      <label>Lugar de recogida
-        <input type="text" id="tripFrom" placeholder="Ej. Pacora" required>
-      </label>
-      <label>Lugar de entrega
-        <input type="text" id="tripTo" placeholder="Ej. Metro Mall" required>
-      </label>
-      <label>Qué transportaste
-        <input type="text" id="tripCargo" placeholder="Ej. Tina, gavetero, mudanza">
-      </label>
-      <label>Precio cobrado ($)
-        <input type="number" id="tripPrice" min="0" step="0.01" required>
-      </label>
-      <label>Kilómetros
-        <input type="number" id="tripKm" min="0" step="0.1">
-      </label>
-      <label>Método de pago
-        <select id="tripPay">
-          <option>Efectivo</option>
-          <option>Yappy</option>
-          <option>Transferencia</option>
-          <option>Otro</option>
-        </select>
-      </label>
-      <label>Observaciones
-        <textarea id="tripNotes" placeholder="Notas del servicio"></textarea>
-      </label>
-      <button class="btn-primary" type="submit">Guardar acarreo</button>
+
+      <div id="tripBatchList">
+
+        <div class="item trip-batch-item" style="margin-top:14px">
+
+          <div class="item-head">
+            <h3 class="batch-title">🚚 Acarreo 1</h3>
+
+            <button
+              class="btn-danger"
+              type="button"
+              onclick="removeBatchTrip(this)">
+              Quitar
+            </button>
+          </div>
+
+          <label>Cliente
+            <input type="text"
+              class="batch-client"
+              placeholder="Nombre del cliente"
+              required>
+          </label>
+
+          <label>Teléfono
+            <input type="tel"
+              class="batch-phone"
+              placeholder="Ej. 6000-0000">
+          </label>
+
+          <label>Lugar de recogida
+            <input type="text"
+              class="batch-from"
+              placeholder="Ej. Pacora"
+              required>
+          </label>
+
+          <label>Lugar de entrega
+            <input type="text"
+              class="batch-to"
+              placeholder="Ej. Metro Mall"
+              required>
+          </label>
+
+          <label>Qué transportaste
+            <input type="text"
+              class="batch-cargo"
+              placeholder="Ej. Tina, gavetero, mudanza">
+          </label>
+
+          <label>Precio cobrado ($)
+            <input type="number"
+              class="batch-price"
+              min="0"
+              step="0.01"
+              required>
+          </label>
+
+          <label>Kilómetros
+            <input type="number"
+              class="batch-km"
+              min="0"
+              step="0.1">
+          </label>
+
+          <label>Método de pago
+            <select class="batch-pay">
+              <option>Efectivo</option>
+              <option>Yappy</option>
+              <option>Transferencia</option>
+              <option>Otro</option>
+            </select>
+          </label>
+
+          <label>Observaciones
+            <textarea
+              class="batch-notes"
+              placeholder="Notas del servicio"></textarea>
+          </label>
+
+        </div>
+
+      </div>
+
+      <button
+        class="btn-secondary"
+        type="button"
+        style="width:100%;margin-top:14px"
+        onclick="addBatchTrip()">
+        ➕ Agregar otro acarreo
+      </button>
+
+      <button
+        class="btn-primary"
+        type="submit"
+        style="width:100%;margin-top:12px">
+        💾 Guardar todos los acarreos
+      </button>
+
     </form>
   </div>
 </section>
@@ -849,15 +916,174 @@ function populateTripOptions(){
   });
   sel.value=current;
 }
+function batchTripHTML(numero){
+  return `
+    <div class="item trip-batch-item" style="margin-top:14px">
+      <div class="item-head">
+        <h3 class="batch-title">🚚 Acarreo ${numero}</h3>
+        <button class="btn-danger" type="button"
+          onclick="removeBatchTrip(this)">
+          Quitar
+        </button>
+      </div>
+
+      <label>Cliente
+        <input type="text" class="batch-client"
+          placeholder="Nombre del cliente" required>
+      </label>
+
+      <label>Teléfono
+        <input type="tel" class="batch-phone"
+          placeholder="Ej. 6000-0000">
+      </label>
+
+      <label>Lugar de recogida
+        <input type="text" class="batch-from"
+          placeholder="Ej. Pacora" required>
+      </label>
+
+      <label>Lugar de entrega
+        <input type="text" class="batch-to"
+          placeholder="Ej. Metro Mall" required>
+      </label>
+
+      <label>Qué transportaste
+        <input type="text" class="batch-cargo"
+          placeholder="Ej. Tina, gavetero, mudanza">
+      </label>
+
+      <label>Precio cobrado ($)
+        <input type="number" class="batch-price"
+          min="0" step="0.01" required>
+      </label>
+
+      <label>Kilómetros
+        <input type="number" class="batch-km"
+          min="0" step="0.1">
+      </label>
+
+      <label>Método de pago
+        <select class="batch-pay">
+          <option>Efectivo</option>
+          <option>Yappy</option>
+          <option>Transferencia</option>
+          <option>Otro</option>
+        </select>
+      </label>
+
+      <label>Observaciones
+        <textarea class="batch-notes"
+          placeholder="Notas del servicio"></textarea>
+      </label>
+    </div>
+  `;
+}
+
+function renumberBatchTrips(){
+  document
+    .querySelectorAll('#tripBatchList .trip-batch-item')
+    .forEach((item,index)=>{
+      item.querySelector('.batch-title').textContent =
+        '🚚 Acarreo ' + (index + 1);
+    });
+}
+
+function addBatchTrip(){
+  const list=document.getElementById('tripBatchList');
+
+  const numero=
+    list.querySelectorAll('.trip-batch-item').length + 1;
+
+  list.insertAdjacentHTML(
+    'beforeend',
+    batchTripHTML(numero)
+  );
+}
+
+function removeBatchTrip(btn){
+  const items=document.querySelectorAll(
+    '#tripBatchList .trip-batch-item'
+  );
+
+  if(items.length===1){
+    toast('Debe quedar al menos un acarreo');
+    return;
+  }
+
+  btn.closest('.trip-batch-item').remove();
+  renumberBatchTrips();
+}
+
 document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
-  const t={
-    id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    date:tripDate.value, client:tripClient.value.trim(), phone:tripPhone.value.trim(),
-    from:tripFrom.value.trim(), to:tripTo.value.trim(), cargo:tripCargo.value.trim(),
-    price:Number(tripPrice.value||0), km:Number(tripKm.value||0), pay:tripPay.value, notes:tripNotes.value.trim()
-  };
-  trips.push(t); save(); e.target.reset(); tripDate.value=todayStr(); toast('Acarreo guardado'); go('inicio');
+
+  const fecha=document.getElementById('tripDate').value;
+
+  const items=[
+    ...document.querySelectorAll(
+      '#tripBatchList .trip-batch-item'
+    )
+  ];
+
+  const nuevos=items.map(item=>({
+    id:crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()+Math.random()),
+
+    date:fecha,
+
+    client:item
+      .querySelector('.batch-client')
+      .value.trim(),
+
+    phone:item
+      .querySelector('.batch-phone')
+      .value.trim(),
+
+    from:item
+      .querySelector('.batch-from')
+      .value.trim(),
+
+    to:item
+      .querySelector('.batch-to')
+      .value.trim(),
+
+    cargo:item
+      .querySelector('.batch-cargo')
+      .value.trim(),
+
+    price:Number(
+      item.querySelector('.batch-price').value||0
+    ),
+
+    km:Number(
+      item.querySelector('.batch-km').value||0
+    ),
+
+    pay:item.querySelector('.batch-pay').value,
+
+    notes:item
+      .querySelector('.batch-notes')
+      .value.trim()
+  }));
+
+  trips.push(...nuevos);
+
+  save();
+  renderDashboard();
+  populateTripOptions();
+
+  document.getElementById('tripBatchList').innerHTML='';
+  addBatchTrip();
+
+  document.getElementById('tripDate').value=fecha;
+
+  toast(
+    nuevos.length +
+    (nuevos.length===1
+      ? ' acarreo guardado'
+      : ' acarreos guardados')
+  );
 });
 document.getElementById('expenseForm').addEventListener('submit',e=>{
   e.preventDefault();
