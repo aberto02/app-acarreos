@@ -52,98 +52,8 @@ button{
   background:#fef3c7;
   color:#92400e;
   animation:maintPulseYellow 1.5s infinite;
-function updateExpenseBatchTotal(){
-
-  const ids=[
-    'expenseFuel',
-    'expenseFood',
-    'expenseToll',
-    'expensePlatform',
-    'expenseMaintenance',
-    'expensePickup',
-    'expenseOther'
-  ];
-
-  const total=ids.reduce((s,id)=>
-    s+Number(document.getElementById(id).value||0),0
-  );
-
-  document.getElementById('expenseBatchTotal').textContent=
-    money(total);
 }
 
-document.getElementById('expenseForm').addEventListener('submit',e=>{
-  e.preventDefault();
-
-  const fecha=expenseDate.value;
-  const tripId=expenseTrip.value;
-  const note=expenseNote.value.trim();
-
-  const datos=[
-    ['Combustible','expenseFuel'],
-    ['Comida','expenseFood'],
-    ['Corredor / Peaje','expenseToll'],
-    ['Plataforma / InDriver','expensePlatform'],
-    ['Mantenimiento','expenseMaintenance'],
-    ['Cuota pickup','expensePickup'],
-    ['Otro','expenseOther']
-  ];
-
-  const nuevos=[];
-
-  datos.forEach(([type,id])=>{
-
-    const amount=
-      Number(document.getElementById(id).value||0);
-
-    if(amount>0){
-      nuevos.push({
-        id:crypto.randomUUID
-          ? crypto.randomUUID()
-          : String(Date.now()+Math.random()),
-        date:fecha,
-        type,
-        amount,
-        tripId,
-        note
-      });
-    }
-
-  });
-
-  if(!nuevos.length){
-    toast('Escribe al menos un gasto');
-    return;
-  }
-
-  expenses.push(...nuevos);
-
-  save();
-  renderDashboard();
-  populateTripOptions();
-
-  [
-    'expenseFuel',
-    'expenseFood',
-    'expenseToll',
-    'expensePlatform',
-    'expenseMaintenance',
-    'expensePickup',
-    'expenseOther'
-  ].forEach(id=>{
-    document.getElementById(id).value='';
-  });
-
-  expenseNote.value='';
-
-  updateExpenseBatchTotal();
-
-  toast(
-    nuevos.length===1
-      ? 'Gasto guardado'
-      : nuevos.length+' gastos guardados'
-  );
-});
 #maintStatus.maint-yellow-medium{
   background:#fde68a;
   color:#92400e;
@@ -156,10 +66,10 @@ document.getElementById('expenseForm').addEventListener('submit',e=>{
   animation:maintPulseYellow .6s infinite;
 }
 
-  #maintStatus.maint-red{
+#maintStatus.maint-red{
   background:#fecaca;
   color:#7f1d1d;
-  border:2px solid #ef4444;
+  border:2px solid #dc2626;
   display:inline-flex;
   align-items:center;
   gap:8px;
@@ -169,35 +79,44 @@ document.getElementById('expenseForm').addEventListener('submit',e=>{
 
 #maintStatus.maint-red::before{
   content:'';
-  width:15px;
-  height:15px;
+  width:16px;
+  height:16px;
   border-radius:50%;
   background:#ff0000;
   flex:none;
   animation:maintRedLight .55s ease-in-out infinite;
 }
 
+@keyframes maintPulseYellow{
+  0%,100%{
+    box-shadow:0 0 0 0 rgba(250,204,21,.2);
+  }
+  50%{
+    box-shadow:0 0 0 8px rgba(250,204,21,.45);
+  }
+}
+
 @keyframes maintPulseRed{
   0%,100%{
     transform:scale(1);
-    box-shadow:0 0 0 0 rgba(255,0,0,.25);
+    box-shadow:0 0 0 0 rgba(220,38,38,.25);
   }
   50%{
     transform:scale(1.06);
-    box-shadow:0 0 0 10px rgba(255,0,0,.35);
+    box-shadow:0 0 0 10px rgba(220,38,38,.45);
   }
 }
 
 @keyframes maintRedLight{
   0%,100%{
-    background:#b91c1c;
-    box-shadow:0 0 4px rgba(255,0,0,.5);
+    background:#991b1b;
+    box-shadow:0 0 3px rgba(255,0,0,.5);
   }
   50%{
     background:#ff0000;
     box-shadow:
       0 0 8px #ff0000,
-      0 0 16px rgba(255,0,0,.9);
+      0 0 18px #ff0000;
   }
 }
 .history-drawer{
