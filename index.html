@@ -1203,9 +1203,9 @@ const costoDieselKmDia=
       <strong class="success">${money(gananciaDia)}</strong>
     </div>
     <div class="toolbar" style="margin-top:12px">
-  <button class="btn-secondary" onclick="editDayDate('${fecha}')">
-    ✏️ Editar fecha
-  </button>
+  <button class="btn-secondary" onclick="editDay('${fecha}')">
+  ✏️ Editar día
+</button>
 
   <button class="btn-danger" onclick="deleteDay('${fecha}')">
     🗑️ Eliminar día
@@ -1319,9 +1319,9 @@ function editTrip(id){
   const km=prompt('Kilómetros:',t.km); if(km===null) return;
   t.price=Number(price||0); t.km=Number(km||0); save(); renderHistory(); toast('Acarreo actualizado');
 }
-  function editDayDate(oldDate){
+function editDay(oldDate){
   const newDate = prompt(
-    'Escribe la nueva fecha (AAAA-MM-DD):',
+    'Fecha del día (AAAA-MM-DD):',
     oldDate
   );
 
@@ -1331,6 +1331,42 @@ function editTrip(id){
 
   if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)){
     alert('Fecha inválida. Usa AAAA-MM-DD');
+    return;
+  }
+
+  const registroKm = odometerRecords.find(
+    r => String(r.date||'').slice(0,10) === oldDate
+  );
+
+  const kmInicialActual =
+    registroKm && Number(registroKm.startKm) > 0
+      ? Number(registroKm.startKm)
+      : '';
+
+  const kmFinalActual =
+    registroKm && recordFinalKm(registroKm) !== null
+      ? recordFinalKm(registroKm)
+      : '';
+
+  const kmInicial = prompt(
+    'Km inicial:',
+    kmInicialActual
+  );
+
+  if(kmInicial === null) return;
+
+  const kmFinal = prompt(
+    'Km final:',
+    kmFinalActual
+  );
+
+  if(kmFinal === null) return;
+
+  const inicio = kmInicial === '' ? 0 : Number(kmInicial);
+  const final = kmFinal === '' ? 0 : Number(kmFinal);
+
+  if(final > 0 && inicio > 0 && final < inicio){
+    alert('El km final no puede ser menor que el km inicial.');
     return;
   }
 
@@ -1346,20 +1382,31 @@ function editTrip(id){
     }
   });
 
-  odometerRecords.forEach(r=>{
-    if(String(r.date||'').slice(0,10) === oldDate){
-      r.date = fecha;
-    }
-  });
+  odometerRecords = odometerRecords.filter(
+    r => String(r.date||'').slice(0,10) !== oldDate
+  );
+
+  if(inicio > 0 || final > 0){
+    odometerRecords.push({
+      date: fecha,
+      startKm: inicio,
+      finalKm: final,
+      km: final
+    });
+  }
 
   save();
   renderHistory();
   renderDashboard();
   renderOdometer();
 
-  toast('Fecha actualizada');
-}
+  toast('Día actualizado');
 
+  if(confirm('¿Quieres agregar un gasto a este día?')){
+    go('gastos');
+    expenseDate.value = fecha;
+  }
+}
 function deleteDay(fecha){
   if(!confirm(
     '¿Eliminar todos los registros del día ' + fecha + '?'
