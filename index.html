@@ -860,6 +860,7 @@ function go(page){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   if(page==='inicio'){ renderDashboard(); renderOdometer(); }
   if(page==='gastos') populateTripOptions();
+  if(page==='nuevo') refreshTripSuggestions();
   if(page==='historial') renderHistory();
   if(page==='clientes') renderClients();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -916,7 +917,81 @@ function populateTripOptions(){
   });
   sel.value=current;
 }
-function batchTripHTML(numero){
+function refreshTripSuggestions(){
+
+  const historial=[...trips].sort((a,b)=>
+    String(b.date||'').localeCompare(String(a.date||''))
+  );
+
+  const grupos=[
+    {
+      id:'suggestClients',
+      selector:'.batch-client',
+      values:historial.map(t=>t.client)
+    },
+    {
+      id:'suggestPhones',
+      selector:'.batch-phone',
+      values:historial.map(t=>t.phone)
+    },
+    {
+      id:'suggestFrom',
+      selector:'.batch-from',
+      values:historial.map(t=>t.from)
+    },
+    {
+      id:'suggestTo',
+      selector:'.batch-to',
+      values:historial.map(t=>t.to)
+    },
+    {
+      id:'suggestCargo',
+      selector:'.batch-cargo',
+      values:historial.map(t=>t.cargo)
+    }
+  ];
+
+  grupos.forEach(g=>{
+
+    let lista=document.getElementById(g.id);
+
+    if(!lista){
+      lista=document.createElement('datalist');
+      lista.id=g.id;
+      document.body.appendChild(lista);
+    }
+
+    lista.innerHTML='';
+
+    const usados=new Set();
+
+    g.values.forEach(valor=>{
+
+      valor=String(valor||'').trim();
+
+      if(!valor) return;
+
+      const clave=valor.toLowerCase();
+
+      if(usados.has(clave)) return;
+
+      usados.add(clave);
+
+      const opcion=document.createElement('option');
+      opcion.value=valor;
+
+      lista.appendChild(opcion);
+    });
+
+    document
+      .querySelectorAll(g.selector)
+      .forEach(input=>{
+        input.setAttribute('list',g.id);
+      });
+
+  });
+}
+  function batchTripHTML(numero){
   return `
     <div class="item trip-batch-item" style="margin-top:14px">
       <div class="item-head">
@@ -998,6 +1073,7 @@ function addBatchTrip(){
     'beforeend',
     batchTripHTML(numero)
   );
+  refreshTripSuggestions();
 }
 
 function removeBatchTrip(btn){
