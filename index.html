@@ -1178,12 +1178,90 @@ function addBatchTrip(){
   refreshTripSuggestions();
 }
 
-toast(
-  nuevos.length +
-  (nuevos.length===1
-    ? ' acarreo guardado'
-    : ' acarreos guardados')
-);
+function removeBatchTrip(btn){
+  const items=document.querySelectorAll(
+    '#tripBatchList .trip-batch-item'
+  );
+
+  if(items.length===1){
+    toast('Debe quedar al menos un acarreo');
+    return;
+  }
+
+  btn.closest('.trip-batch-item').remove();
+  renumberBatchTrips();
+}
+
+document.getElementById('tripForm').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  const fecha=document.getElementById('tripDate').value;
+
+  const items=[
+    ...document.querySelectorAll(
+      '#tripBatchList .trip-batch-item'
+    )
+  ];
+
+  const nuevos=items.map(item=>({
+    id:crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()+Math.random()),
+
+    date:fecha,
+
+    client:item
+      .querySelector('.batch-client')
+      .value.trim(),
+
+    phone:item
+      .querySelector('.batch-phone')
+      .value.trim(),
+
+    from:item
+      .querySelector('.batch-from')
+      .value.trim(),
+
+    to:item
+      .querySelector('.batch-to')
+      .value.trim(),
+
+    cargo:item
+      .querySelector('.batch-cargo')
+      .value.trim(),
+
+    price:Number(
+      item.querySelector('.batch-price').value||0
+    ),
+
+    km:Number(
+      item.querySelector('.batch-km').value||0
+    ),
+
+    pay:item.querySelector('.batch-pay').value,
+
+    notes:item
+      .querySelector('.batch-notes')
+      .value.trim()
+  }));
+
+  trips.push(...nuevos);
+
+  save();
+  renderDashboard();
+  populateTripOptions();
+
+  document.getElementById('tripBatchList').innerHTML='';
+  addBatchTrip();
+
+  document.getElementById('tripDate').value=fecha;
+
+  toast(
+    nuevos.length +
+    (nuevos.length===1
+      ? ' acarreo guardado'
+      : ' acarreos guardados')
+  );
 });
 
 function updateExpenseBatchTotal(){
