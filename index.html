@@ -217,109 +217,253 @@ nav{
 </header>
 
 <main>
+
 <section id="inicio" class="page active">
-  <div class="card" style="margin-bottom:12px">
-  <div class="item-head">
-    <div>
-      <h3 style="margin:0">🚘 Kilometraje diario</h3>
-      <div class="small">Registra al salir y al regresar</div>
-    </div>
-    <span class="badge" id="odoLatest">Sin registro</span>
-  </div>
 
-   <label>Km inicial
-  <input type="number" id="odoStartKmInput" min="0" step="1" placeholder="Ej. 209500">
-</label>
+  <h2 class="section-title">📊 Resumen de hoy</h2>
 
-<label>Km final
-  <input type="number" id="odoFinalKmInput" min="0" step="1" placeholder="Al regresar">
-</label>
-
-<button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveOdometer()">
-  Guardar
-</button>
-
-<div class="row">
-  <span>Km recorrido</span>
-  <strong id="odoTodayKm">0 km</strong>
-</div> 
-    <div class="row">
-  <span>⛽ Diésel hoy</span>
-  <strong id="odoFuelToday">$0.00</strong>
-</div>
-
-<div class="row">
-  <span>Costo diésel/km</span>
-  <strong id="odoFuelPerKm">—</strong>
-</div>
-
-  
-  
-    
-</div>
- <div class="card" style="margin-bottom:12px">
-  <div class="item-head">
-    <div>
-      <h3 style="margin:0">🛠️ Mantenimiento</h3>
-      <div class="small">Control de cambio de aceite</div>
-    </div>
-    <span class="badge" id="maintStatus">Sin configurar</span>
-  </div>
-
-  <label>Km del último cambio de aceite
-    <input type="number" id="maintLastKm" min="0" step="1" placeholder="Ej. 205000">
-  </label>
-
-  <label>Cambiar cada
-    <input type="number" id="maintIntervalKm" min="1" step="1" placeholder="Ej. 5000">
-  </label>
-
-  <button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveMaintenance()">
-    Guardar mantenimiento
-  </button>
-
-  <div class="row">
-    <span>Próximo cambio</span>
-    <strong id="maintNextKm">—</strong>
-  </div>
-
-  <div class="row">
-    <span>Faltan</span>
-    <strong id="maintRemainingKm">—</strong>
-  </div>
-</div>
   <div class="grid">
-    <div class="card kpi"><div class="label">Acarreos hoy</div><div class="value" id="kpiViajes">0</div></div>
-    <div class="card kpi"><div class="label">Ingresos hoy</div><div class="value" id="kpiIngresos">$0.00</div></div>
-    <div class="card kpi"><div class="label">Gastos hoy</div><div class="value danger" id="kpiGastos">$0.00</div></div>
-    <div class="card kpi"><div class="label">Ganancia hoy</div><div class="value success" id="kpiGanancia">$0.00</div></div>
-  </div>
+    <div class="card kpi">
+      <div class="label">Acarreos hoy</div>
+      <div class="value" id="kpiViajes">0</div>
+    </div>
 
-  <h2 class="section-title">Acciones rápidas</h2>
-  <div class="actions">
-    <button class="btn-primary" onclick="go('nuevo')">+ Nuevo acarreo</button>
-    <button class="btn-secondary" onclick="go('gastos')">+ Registrar gasto</button>
-    <button class="btn-secondary" onclick="go('historial')">Ver historial</button>
-    <button class="btn-secondary" onclick="go('clientes')">Ver clientes</button>
-  </div>
+    <div class="card kpi">
+      <div class="label">Ingresos hoy</div>
+      <div class="value" id="kpiIngresos">$0.00</div>
+    </div>
 
-  <h2 class="section-title">Resumen del mes</h2>
-  <div class="card">
-    <div class="row"><span>Viajes</span><strong id="mesViajes">0</strong></div>
-    <div class="row"><span>Ingresos</span><strong id="mesIngresos">$0.00</strong></div>
-    <div class="row"><span>Gastos</span><strong id="mesGastos">$0.00</strong></div>
-    <div class="row"><span>Ganancia</span><strong class="success" id="mesGanancia">$0.00</strong></div>
-  </div>
+    <div class="card kpi">
+      <div class="label">Gastos hoy</div>
+      <div class="value danger" id="kpiGastos">$0.00</div>
+    </div>
 
-  <h2 class="section-title">Respaldo</h2>
-  <div class="card">
-    <div class="note">Los datos se guardan en este dispositivo. Conviene exportar un respaldo regularmente.</div>
-    <div class="toolbar" style="margin-top:10px">
-      <button class="btn-success" onclick="exportData()">Exportar respaldo</button>
-      <button class="btn-secondary" onclick="document.getElementById('importFile').click()">Importar respaldo</button>
-      <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)">
+    <div class="card kpi">
+      <div class="label">Ganancia hoy</div>
+      <div class="value success" id="kpiGanancia">$0.00</div>
     </div>
   </div>
+
+
+  <h2 class="section-title">⚡ Acciones rápidas</h2>
+
+  <div class="actions">
+
+    <button
+      class="btn-primary"
+      onclick="go('nuevo')">
+      + Nuevo acarreo
+    </button>
+
+    <button
+      class="btn-secondary"
+      onclick="go('gastos')">
+      + Registrar gasto
+    </button>
+
+    <button
+      class="btn-secondary"
+      onclick="go('historial')">
+      📋 Historial
+    </button>
+
+    <button
+      class="btn-secondary"
+      onclick="go('clientes')">
+      👤 Clientes
+    </button>
+
+  </div>
+
+
+  <h2 class="section-title">🚘 Kilometraje diario</h2>
+
+  <div class="card" style="margin-bottom:12px">
+
+    <div class="item-head">
+
+      <div>
+        <h3 style="margin:0">Kilometraje del vehículo</h3>
+        <div class="small">Registra al salir y al regresar</div>
+      </div>
+
+      <span class="badge" id="odoLatest">
+        Sin registro
+      </span>
+
+    </div>
+
+    <label>
+      Km inicial
+      <input
+        type="number"
+        id="odoStartKmInput"
+        min="0"
+        step="1"
+        placeholder="Ej. 209500">
+    </label>
+
+    <label>
+      Km final
+      <input
+        type="number"
+        id="odoFinalKmInput"
+        min="0"
+        step="1"
+        placeholder="Al regresar">
+    </label>
+
+    <button
+      class="btn-primary"
+      style="width:100%;margin-top:10px"
+      onclick="saveOdometer()">
+      Guardar kilometraje
+    </button>
+
+    <div class="row">
+      <span>Km recorrido</span>
+      <strong id="odoTodayKm">0 km</strong>
+    </div>
+
+    <div class="row">
+      <span>⛽ Diésel hoy</span>
+      <strong id="odoFuelToday">$0.00</strong>
+    </div>
+
+    <div class="row">
+      <span>Costo diésel/km</span>
+      <strong id="odoFuelPerKm">—</strong>
+    </div>
+
+  </div>
+
+
+  <h2 class="section-title">🛠️ Mantenimiento</h2>
+
+  <div class="card" style="margin-bottom:12px">
+
+    <div class="item-head">
+
+      <div>
+        <h3 style="margin:0">Cambio de aceite</h3>
+        <div class="small">
+          Control de mantenimiento del vehículo
+        </div>
+      </div>
+
+      <span class="badge" id="maintStatus">
+        Sin configurar
+      </span>
+
+    </div>
+
+    <label>
+      Km del último cambio de aceite
+      <input
+        type="number"
+        id="maintLastKm"
+        min="0"
+        step="1"
+        placeholder="Ej. 205000">
+    </label>
+
+    <label>
+      Cambiar cada
+      <input
+        type="number"
+        id="maintIntervalKm"
+        min="1"
+        step="1"
+        placeholder="Ej. 5000">
+    </label>
+
+    <button
+      class="btn-primary"
+      style="width:100%;margin-top:10px"
+      onclick="saveMaintenance()">
+      Guardar mantenimiento
+    </button>
+
+    <div class="row">
+      <span>Próximo cambio</span>
+      <strong id="maintNextKm">—</strong>
+    </div>
+
+    <div class="row">
+      <span>Faltan</span>
+      <strong id="maintRemainingKm">—</strong>
+    </div>
+
+  </div>
+
+
+  <h2 class="section-title">📅 Resumen del mes</h2>
+
+  <div class="card">
+
+    <div class="row">
+      <span>Acarreos</span>
+      <strong id="mesViajes">0</strong>
+    </div>
+
+    <div class="row">
+      <span>Ingresos</span>
+      <strong id="mesIngresos">$0.00</strong>
+    </div>
+
+    <div class="row">
+      <span>Gastos</span>
+      <strong id="mesGastos">$0.00</strong>
+    </div>
+
+    <div class="row">
+      <span>Ganancia</span>
+      <strong
+        class="success"
+        id="mesGanancia">
+        $0.00
+      </strong>
+    </div>
+
+  </div>
+
+
+  <h2 class="section-title">💾 Respaldo</h2>
+
+  <div class="card">
+
+    <div class="note">
+      Los datos se guardan en este dispositivo.
+      Conviene crear un respaldo regularmente.
+    </div>
+
+    <div
+      class="toolbar"
+      style="margin-top:10px">
+
+      <button
+        class="btn-success"
+        onclick="exportData()">
+        Exportar respaldo
+      </button>
+
+      <button
+        class="btn-secondary"
+        onclick="document.getElementById('importFile').click()">
+        Importar respaldo
+      </button>
+
+      <input
+        id="importFile"
+        type="file"
+        accept=".json"
+        style="display:none"
+        onchange="importData(event)">
+
+    </div>
+
+  </div>
+
 </section>
 
 <section id="nuevo" class="page">
