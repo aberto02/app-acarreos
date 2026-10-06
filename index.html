@@ -347,18 +347,35 @@ nav{
             </button>
           </div>
 
-          <label>Cliente
-            <input type="text"
-              class="batch-client"
-              placeholder="Nombre del cliente"
-              required>
-          </label>
+      <label>Cliente
+  <input type="text"
+    class="batch-client"
+    placeholder="Nombre del cliente"
+    oninput="fillPhoneFromClient(this)"
+    required>
+</label>
 
-          <label>Teléfono
-            <input type="tel"
-              class="batch-phone"
-              placeholder="Ej. 6000-0000">
-          </label>
+<label>Teléfono
+  <input type="tel"
+    class="batch-phone"
+    placeholder="Ej. 6000-0000">
+</label>
+
+<div class="toolbar" style="margin-top:8px">
+  <button
+    type="button"
+    class="btn-secondary"
+    onclick="pickBatchContact(this)">
+    👤 Contactos
+  </button>
+
+  <button
+    type="button"
+    class="btn-success"
+    onclick="openBatchWhatsApp(this)">
+    💬 WhatsApp
+  </button>
+</div>
 
           <label>Lugar de recogida
             <input type="text"
@@ -1093,6 +1110,91 @@ function refreshTripSuggestions(){
 
   });
 }
+  function fillPhoneFromClient(input){
+  const item=input.closest('.trip-batch-item');
+  if(!item) return;
+
+  const phoneInput=item.querySelector('.batch-phone');
+  const nombre=String(input.value||'').trim().toLowerCase();
+
+  if(!nombre) return;
+
+  const cliente=[...trips]
+    .filter(t =>
+      String(t.client||'').trim().toLowerCase()===nombre &&
+      String(t.phone||'').trim()
+    )
+    .sort((a,b)=>
+      String(b.date||'').localeCompare(String(a.date||''))
+    )[0];
+
+  if(cliente){
+    phoneInput.value=cliente.phone;
+  }
+}
+
+async function pickBatchContact(button){
+  const item=button.closest('.trip-batch-item');
+
+  if(!item) return;
+
+  if(!navigator.contacts || !navigator.contacts.select){
+    toast('Tu navegador no permite abrir contactos');
+    return;
+  }
+
+  try{
+    const contacts=await navigator.contacts.select(
+      ['name','tel'],
+      {multiple:false}
+    );
+
+    if(!contacts.length) return;
+
+    const contact=contacts[0];
+
+    const nameInput=item.querySelector('.batch-client');
+    const phoneInput=item.querySelector('.batch-phone');
+
+    if(contact.name && contact.name.length){
+      nameInput.value=contact.name[0];
+    }
+
+    if(contact.tel && contact.tel.length){
+      phoneInput.value=contact.tel[0];
+    }
+
+    toast('Contacto seleccionado');
+
+  }catch(error){
+    console.log(error);
+  }
+}
+
+function openBatchWhatsApp(button){
+  const item=button.closest('.trip-batch-item');
+
+  if(!item) return;
+
+  const phoneInput=item.querySelector('.batch-phone');
+
+  let numero=String(phoneInput.value||'')
+    .replace(/\D/g,'');
+
+  if(!numero){
+    toast('Primero escribe o selecciona un teléfono');
+    return;
+  }
+
+  if(numero.length<=8){
+    numero='507'+numero;
+  }
+
+  window.open(
+    'https://wa.me/'+numero,
+    '_blank'
+  );
+}
   function batchTripHTML(numero){
   return `
     <div class="item trip-batch-item" style="margin-top:14px">
@@ -1105,14 +1207,34 @@ function refreshTripSuggestions(){
       </div>
 
       <label>Cliente
-        <input type="text" class="batch-client"
-          placeholder="Nombre del cliente" required>
-      </label>
+  <input type="text"
+    class="batch-client"
+    placeholder="Nombre del cliente"
+    oninput="fillPhoneFromClient(this)"
+    required>
+</label>
 
-      <label>Teléfono
-        <input type="tel" class="batch-phone"
-          placeholder="Ej. 6000-0000">
-      </label>
+<label>Teléfono
+  <input type="tel"
+    class="batch-phone"
+    placeholder="Ej. 6000-0000">
+</label>
+
+<div class="toolbar" style="margin-top:8px">
+  <button
+    type="button"
+    class="btn-secondary"
+    onclick="pickBatchContact(this)">
+    👤 Contactos
+  </button>
+
+  <button
+    type="button"
+    class="btn-success"
+    onclick="openBatchWhatsApp(this)">
+    💬 WhatsApp
+  </button>
+</div>
 
       <label>Lugar de recogida
         <input type="text" class="batch-from"
