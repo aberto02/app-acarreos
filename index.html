@@ -467,7 +467,8 @@ nav{
 </section>
 
 <section id="nuevo" class="page">
-  <h2 class="section-title">Acarreos del día</h2>
+  <h2 class="section-title">🚚 Nuevo acarreo</h2>
+<div class="small" style="margin:-4px 0 12px">Registra uno o varios servicios del mismo día</div>
 
   <div class="card">
     <form id="tripForm">
@@ -491,21 +492,28 @@ nav{
             </button>
           </div>
 
-      <label>Cliente
-  <input type="text"
-    class="batch-client"
-    placeholder="Nombre del cliente"
-    oninput="fillPhoneFromClient(this)"
-    required>
-</label>
+      <div class="grid" style="margin-top:10px">
 
-<label>Teléfono
-  <input type="tel"
-    class="batch-phone"
-    placeholder="Ej. 6000-0000">
-</label>
+  <label>👤 Cliente
+    <input
+      type="text"
+      class="batch-client"
+      placeholder="Nombre del cliente"
+      oninput="fillPhoneFromClient(this)"
+      required>
+  </label>
+
+  <label>📞 Teléfono
+    <input
+      type="tel"
+      class="batch-phone"
+      placeholder="6000-0000">
+  </label>
+
+</div>
 
 <div class="toolbar" style="margin-top:8px">
+
   <button
     type="button"
     class="btn-secondary"
@@ -519,57 +527,72 @@ nav{
     onclick="openBatchWhatsApp(this)">
     💬 WhatsApp
   </button>
+
 </div>
 
-          <label>Lugar de recogida
-            <input type="text"
-              class="batch-from"
-              placeholder="Ej. Pacora"
-              required>
-          </label>
+          <div class="grid">
 
-          <label>Lugar de entrega
-            <input type="text"
-              class="batch-to"
-              placeholder="Ej. Metro Mall"
-              required>
-          </label>
+  <label>📍 Recogida
+    <input
+      type="text"
+      class="batch-from"
+      placeholder="Ej. Pacora"
+      required>
+  </label>
 
-          <label>Qué transportaste
-            <input type="text"
-              class="batch-cargo"
-              placeholder="Ej. Tina, gavetero, mudanza">
-          </label>
+  <label>🏁 Entrega
+    <input
+      type="text"
+      class="batch-to"
+      placeholder="Ej. Metro Mall"
+      required>
+  </label>
 
-          <label>Precio cobrado ($)
-            <input type="number"
-              class="batch-price"
-              min="0"
-              step="0.01"
-              required>
-          </label>
+</div>
 
-          <label>Kilómetros
-            <input type="number"
-              class="batch-km"
-              min="0"
-              step="0.1">
-          </label>
+          <label>📦 Qué transportaste
+  <input
+    type="text"
+    class="batch-cargo"
+    placeholder="Ej. Tina, gavetero, mudanza">
+</label>
 
-          <label>Método de pago
-            <select class="batch-pay">
-              <option>Efectivo</option>
-              <option>Yappy</option>
-              <option>Transferencia</option>
-              <option>Otro</option>
-            </select>
-          </label>
+<div class="grid">
 
-          <label>Observaciones
-            <textarea
-              class="batch-notes"
-              placeholder="Notas del servicio"></textarea>
-          </label>
+  <label>💵 Precio ($)
+    <input
+      type="number"
+      class="batch-price"
+      min="0"
+      step="0.01"
+      required>
+  </label>
+
+  <label>🛣️ Kilómetros
+    <input
+      type="number"
+      class="batch-km"
+      min="0"
+      step="0.1">
+  </label>
+
+</div>
+
+        <label>💳 Método de pago
+  <select class="batch-pay">
+    <option>Efectivo</option>
+    <option>Yappy</option>
+    <option>Transferencia</option>
+    <option>Otro</option>
+  </select>
+</label>
+
+<label>📝 Observaciones
+  <textarea
+    class="batch-notes"
+    placeholder="Notas del servicio"
+    style="min-height:70px"></textarea>
+</label>
 
         </div>
 
