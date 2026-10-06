@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1697ff"/>
+      <stop offset=".45" stop-color="#0754d8"/>
+      <stop offset="1" stop-color="#07174d"/>
+    </linearGradient>
+
+    <linearGradient id="box" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd447"/>
+      <stop offset=".45" stop-color="#ff9d00"/>
+      <stop offset="1" stop-color="#f15a00"/>
+    </linearGradient>
+
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="10"
+        flood-color="#001542" flood-opacity=".45"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="512" height="512" rx="105" fill="url(#bg)"/>
+
+  <!-- A -->
+  <path
+    d="M256 62
+       L458 447
+       H367
+       L321 354
+       H191
+       L145 447
+       H54
+       Z
+       M256 175
+       L218 278
+       H294
+       Z"
+    fill="#ffffff"
+    fill-rule="evenodd"
+    filter="url(#shadow)"/>
+
+  <!-- Carretera -->
+  <path
+    d="M105 414
+       C165 374 184 325 235 305
+       C278 288 330 299 397 335"
+    fill="none"
+    stroke="#111827"
+    stroke-width="72"
+    stroke-linecap="round"/>
+
+  <!-- Líneas de carretera -->
+  <path
+    d="M105 414
+       C165 374 184 325 235 305
+       C278 288 330 299 397 335"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="9"
+    stroke-linecap="round"
+    stroke-dasharray="25 28"/>
+
+  <!-- Estelas de velocidad -->
+  <path d="M258 345 H335" stroke="#ff6b00"
+    stroke-width="12" stroke-linecap="round"/>
+  <path d="M242 365 H324" stroke="#ff9d00"
+    stroke-width="9" stroke-linecap="round"/>
+  <path d="M270 386 H329" stroke="#ffd447"
+    stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Caja -->
+  <g filter="url(#shadow)">
+    <rect x="323" y="316" width="105" height="82"
+      rx="14" fill="url(#box)"/>
+    <path d="M323 337 L375 304 L428 324 L376 357 Z"
+      fill="#ffc233"/>
+    <path d="M376 357 L428 324 V379
+      Q428 392 416 398 L376 414 Z"
+      fill="#f27600"/>
+    <path d="M365 310 L383 305 L395 310 L376 318 Z"
+      fill="#fff2c4"/>
+    <path d="M376 318 L395 310 V340 L376 348 Z"
+      fill="#ffe3a0"/>
+  </g>
+</svg>
