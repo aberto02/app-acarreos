@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -560,6 +560,12 @@ nav{
     class="batch-cargo"
     placeholder="Ej. Tina, gavetero, mudanza">
 </label>
+          <label>👷 Ayudante
+  <input
+    type="text"
+    class="batch-helper"
+    placeholder="Nombre del ayudante">
+          </label>
 
 <div class="grid">
 
@@ -1445,6 +1451,12 @@ function batchTripHTML(numero){
           class="batch-cargo"
           placeholder="Ej. Tina, gavetero, mudanza">
       </label>
+      <label>👷 Ayudante
+  <input
+    type="text"
+    class="batch-helper"
+    placeholder="Nombre del ayudante">
+</label>
 
       <div class="grid">
 
@@ -1559,6 +1571,9 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
     cargo:item
       .querySelector('.batch-cargo')
       .value.trim(),
+    helper:item
+  .querySelector('.batch-helper')
+  .value.trim(),
 
     price:Number(
       item.querySelector('.batch-price').value||0
@@ -1948,6 +1963,10 @@ const costoDieselKmDia=
           <span>Ganancia</span>
           <strong class="success">${money(profit)}</strong>
         </div>
+        <div class="row">
+  <span>👷 Ayudante</span>
+  <strong>${esc(t.helper||'—')}</strong>
+</div>
 
         <div class="row">
           <span>Kilómetros</span>
