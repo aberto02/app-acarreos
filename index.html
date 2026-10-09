@@ -1596,18 +1596,7 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
   }));
 
   trips.push(...nuevos);
- nuevos.forEach(t=>{
-  if(Number(t.helper)>0){
-    expenses.push({
-      id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
-      date:t.date,
-      
-      amount:Number(t.helper),
-      tripId:t.id,
-      type:'Ayudante',
-    });
-  }
-});
+ 
  renderHistory();
 
   save();
