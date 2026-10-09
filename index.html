@@ -2152,10 +2152,93 @@ function deleteTrip(id){
   save(); renderHistory(); toast('Acarreo eliminado');
 }
 function editTrip(id){
-  const t=trips.find(x=>x.id===id); if(!t) return;
-  const price=prompt('Nuevo precio cobrado:',t.price); if(price===null) return;
-  const km=prompt('Kilómetros:',t.km); if(km===null) return;
-  t.price=Number(price||0); t.km=Number(km||0); save(); renderHistory(); toast('Acarreo actualizado');
+  const t=trips.find(x=>x.id===id);
+  if(!t) return;
+
+  const viejo=document.getElementById('editTripModal');
+  if(viejo) viejo.remove();
+
+  const modal=document.createElement('div');
+  modal.id='editTripModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+
+  modal.innerHTML=`
+    <div style="background:var(--card);color:var(--text);width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:22px;padding:20px">
+      <h2 style="margin-top:0">✏️ Editar acarreo</h2>
+
+      <label>Fecha</label>
+      <input id="editDate" type="date" value="${esc(t.date||'')}">
+
+      <label>Cliente</label>
+      <input id="editClient" value="${esc(t.client||'')}">
+
+      <label>Teléfono</label>
+      <input id="editPhone" value="${esc(t.phone||'')}">
+
+      <label>Recogida</label>
+      <input id="editFrom" value="${esc(t.from||'')}">
+
+      <label>Entrega</label>
+      <input id="editTo" value="${esc(t.to||'')}">
+
+      <label>Cobrado ($)</label>
+      <input id="editPrice" type="number" step="0.01" value="${Number(t.price||0)}">
+
+      <label>Pago ayudante ($)</label>
+      <input id="editHelper" type="number" step="0.01" value="${Number(t.helper||0)}">
+
+      <label>Kilómetros</label>
+      <input id="editKm" type="number" step="0.1" value="${Number(t.km||0)}">
+
+      <div class="toolbar" style="margin-top:18px">
+        <button class="btn-secondary" type="button"
+          onclick="document.getElementById('editTripModal').remove()">
+          Cancelar
+        </button>
+
+        <button class="btn-success" type="button" onclick="saveTripEdit('${t.id}')">
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+function saveTripEdit(id){
+  const t=trips.find(x=>x.id===id);
+  if(!t) return;
+
+  const helperAnterior=Number(t.helper||0);
+
+  t.date=document.getElementById('editDate').value;
+  t.client=document.getElementById('editClient').value.trim();
+  t.phone=document.getElementById('editPhone').value.trim();
+  t.from=document.getElementById('editFrom').value.trim();
+  t.to=document.getElementById('editTo').value.trim();
+  t.price=Number(document.getElementById('editPrice').value||0);
+  t.helper=Number(document.getElementById('editHelper').value||0);
+  t.km=Number(document.getElementById('editKm').value||0);
+
+  expenses=expenses.filter(e=>!(e.tripId===id && (e.type==='Ayudante' || e.category==='Ayudante')));
+
+  if(t.helper>0){
+    expenses.push({
+      id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      date:t.date,
+      amount:t.helper,
+      tripId:t.id,
+      type:'Ayudante'
+    });
+  }
+
+  save();
+  document.getElementById('editTripModal').remove();
+  renderHistory();
+  renderDashboard();
+  populateTripOptions();
+  toast('Acarreo actualizado');
 }
 function manageDayExpenses(fecha){
   const gastosDia = expenses.filter(e =>
