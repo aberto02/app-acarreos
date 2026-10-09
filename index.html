@@ -1945,7 +1945,8 @@ const costoDieselKmDia=
   ? viajesDia.map((t,index)=>{
 
     const ge=tripExpenseTotal(t.id);
-    const profit=Number(t.price||0)-ge;
+    const helperCost=Number(t.helper||0);
+const profit=Number(t.price||0)-ge-helperCost;
 
     return `
     <details class="trip-drawer">
