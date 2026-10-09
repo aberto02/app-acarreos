@@ -1576,9 +1576,9 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
     cargo:item
       .querySelector('.batch-cargo')
       .value.trim(),
-    helper:item
-  .querySelector('.batch-helper')
-  .value.trim(),
+    helper:Number(
+  item.querySelector('.batch-helper').value||0
+),
 
     price:Number(
       item.querySelector('.batch-price').value||0
