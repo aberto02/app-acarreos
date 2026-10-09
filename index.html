@@ -2150,85 +2150,207 @@ function manageDayExpenses(fecha){
     return;
   }
 
-  let lista = 'GASTOS DEL ' + fecha + '\n\n';
+  const viejo = document.getElementById('expenseManagerModal');
+  if(viejo) viejo.remove();
 
-  gastosDia.forEach((g,i)=>{
-    lista +=
-      (i + 1) + ' = ' +
-      (g.type || 'Gasto') + ' ' +
-      money(g.amount) + '\n';
-  });
+  const modal = document.createElement('div');
+  modal.id = 'expenseManagerModal';
 
-  const numero = prompt(
-    lista +
-    '\nEscribe el número de la línea que quieres editar o borrar:'
+  modal.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  `;
+
+  const filas = gastosDia.map(g => `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:12px 0;
+      border-bottom:1px solid #e5e7eb;
+    ">
+      <div style="flex:1;">
+        <strong>${esc(g.type || 'Gasto')}</strong>
+        <div style="font-size:18px;margin-top:3px;">
+          ${money(g.amount)}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onclick="editExpenseItem('${g.id}')"
+        style="
+          border:0;
+          border-radius:10px;
+          padding:10px;
+          font-size:18px;
+          cursor:pointer;
+        "
+      >✏️</button>
+
+      <button
+        type="button"
+        onclick="deleteExpenseItem('${g.id}')"
+        style="
+          border:0;
+          border-radius:10px;
+          padding:10px;
+          font-size:18px;
+          cursor:pointer;
+        "
+      >🗑️</button>
+    </div>
+  `).join('');
+
+  modal.innerHTML = `
+    <div style="
+      background:white;
+      width:100%;
+      max-width:460px;
+      max-height:80vh;
+      overflow:auto;
+      border-radius:20px;
+      padding:20px;
+      box-shadow:0 20px 50px rgba(0,0,0,.3);
+    ">
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:12px;
+      ">
+        <div>
+          <div style="font-size:20px;font-weight:800;">
+            Gastos del día
+          </div>
+          <div style="color:#6b7280;">
+            ${fecha}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onclick="closeExpenseManager()"
+          style="
+            border:0;
+            background:transparent;
+            font-size:26px;
+            cursor:pointer;
+          "
+        >✕</button>
+      </div>
+
+      ${filas}
+
+      <button
+        type="button"
+        onclick="closeExpenseManager()"
+        style="
+          width:100%;
+          margin-top:18px;
+          padding:13px;
+          border:0;
+          border-radius:12px;
+          font-size:16px;
+          font-weight:700;
+          cursor:pointer;
+        "
+      >
+        Cerrar
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+
+function closeExpenseManager(){
+  const modal = document.getElementById('expenseManagerModal');
+  if(modal) modal.remove();
+}
+
+
+function deleteExpenseItem(id){
+  const gasto = expenses.find(e =>
+    String(e.id) === String(id)
   );
 
-  if(numero === null) return;
+  if(!gasto) return;
 
-  const n = Number(numero);
+  if(!confirm(
+    '¿Eliminar ' +
+    (gasto.type || 'Gasto') +
+    ' ' +
+    money(gasto.amount) +
+    '?'
+  )) return;
 
-  if(!Number.isInteger(n) || n < 1 || n > gastosDia.length){
-    alert('Número inválido.');
-    return;
-  }
+  const fecha = String(gasto.date || '').slice(0,10);
 
-  const gasto = gastosDia[n - 1];
-
-  const accion = prompt(
-    (gasto.type || 'Gasto') + ' ' + money(gasto.amount) +
-    '\n\nEscribe:' +
-    '\nE = Editar' +
-    '\nB = Borrar'
+  expenses = expenses.filter(e =>
+    String(e.id) !== String(id)
   );
 
-  if(accion === null) return;
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
 
-  if(accion.trim().toUpperCase() === 'B'){
-    if(!confirm(
-      '¿Confirmas borrar ' +
-      (gasto.type || 'Gasto') +
-      ' ' + money(gasto.amount) + '?'
-    )) return;
+  closeExpenseManager();
 
-    expenses = expenses.filter(e =>
-      String(e.id) !== String(gasto.id)
-    );
+  const quedan = expenses.some(e =>
+    String(e.date || '').slice(0,10) === fecha
+  );
 
-    save();
-    renderHistory();
-    renderDashboard();
-    renderOdometer();
-    toast('Gasto eliminado');
+  if(quedan){
+    manageDayExpenses(fecha);
+  }
+
+  toast('Gasto eliminado');
+}
+
+
+function editExpenseItem(id){
+  const gasto = expenses.find(e =>
+    String(e.id) === String(id)
+  );
+
+  if(!gasto) return;
+
+  const nuevo = prompt(
+    'Nuevo monto para ' + (gasto.type || 'Gasto') + ':',
+    Number(gasto.amount || 0).toFixed(2)
+  );
+
+  if(nuevo === null) return;
+
+  const monto = Number(nuevo);
+
+  if(!Number.isFinite(monto) || monto < 0){
+    alert('Monto inválido.');
     return;
   }
 
-  if(accion.trim().toUpperCase() === 'E'){
-    const nuevoMonto = prompt(
-      'Nuevo monto:',
-      Number(gasto.amount || 0).toFixed(2)
-    );
+  const fecha = String(gasto.date || '').slice(0,10);
 
-    if(nuevoMonto === null) return;
+  gasto.amount = monto;
 
-    const monto = Number(nuevoMonto);
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
 
-    if(!Number.isFinite(monto) || monto < 0){
-      alert('Monto inválido.');
-      return;
-    }
+  closeExpenseManager();
+  manageDayExpenses(fecha);
 
-    gasto.amount = monto;
-
-    save();
-    renderHistory();
-    renderDashboard();
-    renderOdometer();
-    toast('Gasto actualizado');
-    return;
-  }
-
-  alert('Escribe E para editar o B para borrar.');
+  toast('Gasto actualizado');
 }
 function editDay(oldDate){
   const newDate = prompt(
