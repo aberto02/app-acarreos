@@ -1601,10 +1601,10 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
     expenses.push({
       id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
       date:t.date,
-      category:'Ayudante',
+      
       amount:Number(t.helper),
       tripId:t.id,
-      note:'Pago ayudante'
+      type:'Ayudante',
     });
   }
 });
