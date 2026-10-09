@@ -2024,6 +2024,9 @@ const costoDieselKmDia=
   <button class="btn-secondary" onclick="editDay('${fecha}')">
   ✏️ Editar día
 </button>
+<button class="btn-secondary" onclick="manageDayExpenses('${fecha}')">
+  🧾 Editar gastos
+</button>
 
   <button class="btn-danger" onclick="deleteDay('${fecha}')">
     🗑️ Eliminar día
@@ -2137,6 +2140,61 @@ function editTrip(id){
   const km=prompt('Kilómetros:',t.km); if(km===null) return;
   t.price=Number(price||0); t.km=Number(km||0); save(); renderHistory(); toast('Acarreo actualizado');
 }
+ function manageDayExpenses(fecha){
+  const gastosDia = expenses.filter(e =>
+    String(e.date || '').slice(0,10) === fecha
+  );
+
+  if(!gastosDia.length){
+    alert('Este día no tiene gastos registrados.');
+    return;
+  }
+
+  let texto = 'GASTOS DEL ' + fecha + '\n\n';
+
+  gastosDia.forEach((g,i)=>{
+    texto +=
+      (i + 1) + ' = ' +
+      (g.type || 'Gasto') + ' ' +
+      money(g.amount) + '\n';
+  });
+
+  texto += '\nEscribe el número del gasto que quieres eliminar:';
+
+  const opcion = prompt(texto);
+
+  if(opcion === null) return;
+
+  const numero = Number(opcion);
+
+  if(
+    !Number.isInteger(numero) ||
+    numero < 1 ||
+    numero > gastosDia.length
+  ){
+    alert('Número inválido.');
+    return;
+  }
+
+  const gasto = gastosDia[numero - 1];
+
+  if(!confirm(
+    '¿Eliminar ' +
+    (gasto.type || 'Gasto') +
+    ' ' + money(gasto.amount) + '?'
+  )) return;
+
+  expenses = expenses.filter(e =>
+    String(e.id) !== String(gasto.id)
+  );
+
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
+
+  toast('Gasto eliminado');
+ }
 function editDay(oldDate){
   const newDate = prompt(
     'Fecha del día (AAAA-MM-DD):',
