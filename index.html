@@ -1976,7 +1976,7 @@ const profit=Number(t.price||0)-ge-helperCost;
 
         <div class="row">
           <span>Gastos ligados</span>
-          <strong class="danger">${money(ge)}</strong>
+          <strong class="danger">${money(ge+helperCost)}</strong>
         </div>
 
         <div class="row">
@@ -1985,7 +1985,7 @@ const profit=Number(t.price||0)-ge-helperCost;
         </div>
         <div class="row">
   <span>👷 Ayudante</span>
-  <strong>${esc(t.helper||'—')}</strong>
+  <strong>$${money(Number(t.helper || 0))}</strong>
 </div>
 
         <div class="row">
