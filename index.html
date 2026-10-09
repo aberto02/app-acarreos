@@ -1946,7 +1946,7 @@ const costoDieselKmDia=
 
     const ge=tripExpenseTotal(t.id);
     const helperCost=Number(t.helper||0);
-const profit=Number(t.price||0)-ge-helperCost;
+const profit=Number(t.price||0)-ge;
 
     return `
     <details class="trip-drawer">
@@ -1968,6 +1968,10 @@ const profit=Number(t.price||0)-ge-helperCost;
           <span>Cliente</span>
           <strong>${esc(t.client||'—')}</strong>
         </div>
+        <div class="row">
+  <span>📦 Carga</span>
+  <strong>${esc(t.cargo || '-')}</strong>
+</div>
 
         <div class="row">
           <span>Cobrado</span>
@@ -1976,7 +1980,7 @@ const profit=Number(t.price||0)-ge-helperCost;
 
         <div class="row">
           <span>Gastos ligados</span>
-          <strong class="danger">${money(ge+helperCost)}</strong>
+         <strong class="danger">${money(ge)}</strong>
         </div>
 
         <div class="row">
