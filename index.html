@@ -560,11 +560,13 @@ nav{
     class="batch-cargo"
     placeholder="Ej. Tina, gavetero, mudanza">
 </label>
-          <label>👷 Ayudante
+          <label>👷 Pago ayudante ($)
   <input
-    type="text"
+    type="number"
     class="batch-helper"
-    placeholder="Nombre del ayudante">
+    min="0"
+    step="0.01"
+    placeholder="$0.00">
           </label>
 
 <div class="grid">
