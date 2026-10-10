@@ -1992,6 +1992,7 @@ const profit=Number(t.price||0)-ge;
         </div>
       </div>
     </details>`;
+   
   }).join('')
   : '<div class="small" style="margin-top:12px">Sin acarreos registrados este día.</div>';
 
@@ -2037,7 +2038,9 @@ const profit=Number(t.price||0)-ge;
 <button class="btn-secondary" onclick="manageDayExpenses('${fecha}')">
   🧾 Editar gastos
 </button>
-
+<button class="btn-primary" onclick="addTripToDay('${fecha}')">
+  ➕ Agregar acarreo
+</button>
   <button class="btn-danger" onclick="deleteDay('${fecha}')">
     🗑️ Eliminar día
   </button>
