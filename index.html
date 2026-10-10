@@ -2617,6 +2617,16 @@ function deleteDay(fecha){
 
   toast('Día eliminado');
 }
+ function addTripToDay(fecha){
+  go('nuevo');
+
+  setTimeout(()=>{
+    const campoFecha = document.getElementById('tripDate');
+    if(campoFecha){
+      campoFecha.value = fecha;
+    }
+  },100);
+ }
 function exportData(){
   const data={version:1,exportedAt:new Date().toISOString(),trips,expenses};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
