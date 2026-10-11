@@ -1176,7 +1176,7 @@ function inRange(date, type){
   if(type==='all') return true;
   if(type==='today') return date===todayStr();
   if(type==='week'){ const diff=(now-d)/86400000; return diff>=0 && diff<7; }
-  if(type==='month'){ return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth(); }
+  if(type==='month') return true;
   return true;
 }
 function tripExpenseTotal(tripId){
@@ -1781,6 +1781,152 @@ function setFilter(btn){
   renderHistory();
 }
 function renderHistory(){
+ if(currentFilter === 'month'){
+  const meses = {};
+
+  function agregarMes(fecha){
+    const f = String(fecha || '').slice(0,7);
+    if(!f) return;
+
+    if(!meses[f]){
+      meses[f] = {
+        ingresos: 0,
+        gastos: 0,
+        fuel: 0,
+        food: 0,
+        toll: 0,
+        platform: 0,
+        other: 0
+      };
+    }
+  }
+
+  trips.forEach(t=>{
+    agregarMes(t.date);
+    const mes=String(t.date||'').slice(0,7);
+    if(meses[mes]){
+      meses[mes].ingresos += Number(t.price||0);
+    }
+  });
+
+  expenses.forEach(e=>{
+    agregarMes(e.date);
+
+    const mes=String(e.date||'').slice(0,7);
+    if(!meses[mes]) return;
+
+    const monto=Number(e.amount||0);
+    const tipo=String(e.type||'').toLowerCase();
+
+    meses[mes].gastos += monto;
+
+    if(tipo.includes('combust')){
+      meses[mes].fuel += monto;
+    }else if(tipo.includes('comida')){
+      meses[mes].food += monto;
+    }else if(tipo.includes('peaje') || tipo.includes('corredor')){
+      meses[mes].toll += monto;
+    }else if(tipo.includes('plataforma') || tipo.includes('indriver')){
+      meses[mes].platform += monto;
+    }else{
+      meses[mes].other += monto;
+    }
+  });
+
+  const nombresMeses=[
+    'ENERO','FEBRERO','MARZO','ABRIL',
+    'MAYO','JUNIO','JULIO','AGOSTO',
+    'SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'
+  ];
+
+  const resumenMensual = Object.keys(meses)
+    .sort((a,b)=>b.localeCompare(a))
+    .map(clave=>{
+
+      const m=meses[clave];
+      const [anio,numeroMes]=clave.split('-');
+      const resultado=m.ingresos-m.gastos;
+
+      const mayor=[
+        ['Combustible',m.fuel],
+        ['Comida',m.food],
+        ['Peaje',m.toll],
+        ['Plataformas',m.platform],
+        ['Otros',m.other]
+      ].sort((a,b)=>b[1]-a[1])[0];
+
+      return `
+        <div class="item" style="margin-bottom:16px">
+
+          <h3 style="margin-bottom:14px">
+            📅 ${nombresMeses[Number(numeroMes)-1]} ${anio}
+          </h3>
+
+          <div class="row">
+            <span>Ingresos</span>
+            <strong>${money(m.ingresos)}</strong>
+          </div>
+
+          <div class="row">
+            <span>Gastos totales</span>
+            <strong>${money(m.gastos)}</strong>
+          </div>
+
+          <div class="row">
+            <span>Resultado del mes</span>
+            <strong style="color:${resultado>=0?'#0f9d58':'#dc2626'}">
+              ${resultado>=0?'+':''}${money(resultado)}
+            </strong>
+          </div>
+
+          <hr>
+
+          <div class="small"><strong>GASTOS DEL MES</strong></div>
+
+          <div class="row">
+            <span>⛽ Combustible</span>
+            <strong>${money(m.fuel)}</strong>
+          </div>
+
+          <div class="row">
+            <span>🍽️ Comida</span>
+            <strong>${money(m.food)}</strong>
+          </div>
+
+          <div class="row">
+            <span>🛣️ Peaje</span>
+            <strong>${money(m.toll)}</strong>
+          </div>
+
+          <div class="row">
+            <span>📱 Plataformas</span>
+            <strong>${money(m.platform)}</strong>
+          </div>
+
+          <div class="row">
+            <span>📦 Otros</span>
+            <strong>${money(m.other)}</strong>
+          </div>
+
+          <hr>
+
+          <div class="row">
+            <span>Mayor gasto</span>
+            <strong style="color:#dc2626">
+              ${mayor && mayor[1]>0
+                ? mayor[0]+' '+money(mayor[1])
+                : 'Sin gastos'}
+            </strong>
+          </div>
+
+        </div>
+      `;
+    }).join('');
+
+  document.getElementById('historyList').innerHTML=resumenMensual;
+
+  return;
+ }
   const list=document.getElementById('historyList');
 
   const ft=trips
