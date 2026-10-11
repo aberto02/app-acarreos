@@ -1882,86 +1882,93 @@ if(summaryCard){
         : '#fdecec';
 
       return `
-        <div class="card" style="margin-bottom:18px">
+        <details class="card" style="margin-bottom:18px">
+  <summary style="
+    cursor:pointer;
+    font-size:22px;
+    font-weight:800;
+    padding:4px 0;
+  ">
+    📅 ${nombresMeses[Number(numeroMes)-1]} ${anio}
+  </summary>
 
-          <h3 style="margin:0 0 14px">
-            📅 ${nombresMeses[Number(numeroMes)-1]} ${anio}
-          </h3>
+  <div style="margin-top:18px">
 
-          <div class="row">
-            <span>Ingresos</span>
-            <strong>${money(m.ingresos)}</strong>
-          </div>
+    <div class="row">
+      <span>Ingresos</span>
+      <strong>${money(m.ingresos)}</strong>
+    </div>
 
-          <div class="row">
-            <span>Gastos totales</span>
-            <strong>${money(m.gastos)}</strong>
-          </div>
+    <div class="row">
+      <span>Gastos totales</span>
+      <strong>${money(m.gastos)}</strong>
+    </div>
 
-          <div class="row">
-            <span>Resultado del mes</span>
-            <strong style="color:${color}">
-              ${resultado>=0?'+':''}${money(resultado)}
-            </strong>
-          </div>
+    <div class="row">
+      <span>Resultado del mes</span>
+      <strong style="color:${color}">
+        ${resultado>=0?'+':''}${money(resultado)}
+      </strong>
+    </div>
 
-          <div style="
-            margin-top:14px;
-            padding:12px;
-            border-radius:12px;
-            text-align:center;
-            font-weight:800;
-            background:${fondo};
-            color:${color};
-          ">
-            ${estado}
-          </div>
+    <div style="
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      text-align:center;
+      font-weight:800;
+      background:${fondo};
+      color:${color};
+    ">
+      ${estado}
+    </div>
 
-          <hr style="margin:18px 0;border:0;border-top:1px solid #e5e7eb">
+    <hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
 
-          <div class="small">
-            <strong>GASTOS DEL MES</strong>
-          </div>
+    <div class="small">
+      <strong>GASTOS DEL MES</strong>
+    </div>
 
-          <div class="row">
-            <span>⛽ Combustible</span>
-            <strong>${money(m.fuel)}</strong>
-          </div>
+    <div class="row">
+      <span>⛽ Combustible</span>
+      <strong>${money(m.fuel)}</strong>
+    </div>
 
-          <div class="row">
-            <span>🍽️ Comida</span>
-            <strong>${money(m.food)}</strong>
-          </div>
+    <div class="row">
+      <span>🍽️ Comida</span>
+      <strong>${money(m.food)}</strong>
+    </div>
 
-          <div class="row">
-            <span>🛣️ Peaje</span>
-            <strong>${money(m.toll)}</strong>
-          </div>
+    <div class="row">
+      <span>🛣️ Peaje</span>
+      <strong>${money(m.toll)}</strong>
+    </div>
 
-          <div class="row">
-            <span>📱 Plataformas</span>
-            <strong>${money(m.platform)}</strong>
-          </div>
+    <div class="row">
+      <span>📱 Plataformas</span>
+      <strong>${money(m.platform)}</strong>
+    </div>
 
-          <div class="row">
-            <span>📦 Otros</span>
-            <strong>${money(m.other)}</strong>
-          </div>
+    <div class="row">
+      <span>📦 Otros</span>
+      <strong>${money(m.other)}</strong>
+    </div>
 
-          <hr style="margin:18px 0;border:0;border-top:1px solid #e5e7eb">
+    <hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
 
-          <div class="row">
-            <span>Mayor gasto</span>
-            <strong style="color:#dc2626">
-              ${
-                mayor && mayor[1]>0
-                  ? mayor[0]+' '+money(mayor[1])
-                  : 'Sin gastos'
-              }
-            </strong>
-          </div>
+    <div class="row">
+      <span>Mayor gasto</span>
+      <strong style="color:#dc2626">
+        ${
+          mayor && mayor[1]>0
+          ? mayor[0]+' '+money(mayor[1])
+          : 'Sin gastos'
+        }
+      </strong>
+    </div>
 
-        </div>
+  </div>
+</details>
       `;
     }).join('');
 
