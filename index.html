@@ -1784,6 +1784,8 @@ function renderHistory(){
   const list=document.getElementById('historyList');
 
   const ft=trips
+  .filter(t=>inRange(t.date,currentFilter))
+  .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
     
   const fe=expenses.filter(e=>inRange(e.date,currentFilter));
 const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
