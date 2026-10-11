@@ -1826,15 +1826,9 @@ if(currentFilter === 'month'){
   histProfit.style.color = resultado < 0 ? '#dc2626' : '#0f9d58';
   monthStatus.style.display = 'none';
 }
-  const out=fe.reduce((s,e)=>s+Number(e.amount||0),0);
-
-  histIncome.textContent=money(income);
-  histExpense.textContent=money(out);
-  histProfit.textContent=money(income-out);
-
   function sumarTipos(arr){
-    const g={fuel:0,food:0,toll:0,platform:0,other:0};
-
+  const g={fuel:0,food:0,toll:0,platform:0,other:0};
+  
     arr.forEach(e=>{
       const tipo=String(e.type||'').toLowerCase();
       const monto=Number(e.amount||0);
