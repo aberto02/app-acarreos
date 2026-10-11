@@ -1785,51 +1785,58 @@ function renderHistory(){
   const meses = {};
 
   function agregarMes(fecha){
-    const f = String(fecha || '').slice(0,7);
-    if(!f) return;
+    const clave = String(fecha || '').slice(0,7);
+    if(!clave) return;
 
-    if(!meses[f]){
-      meses[f] = {
-        ingresos: 0,
-        gastos: 0,
-        fuel: 0,
-        food: 0,
-        toll: 0,
-        platform: 0,
-        other: 0
+    if(!meses[clave]){
+      meses[clave] = {
+        ingresos:0,
+        gastos:0,
+        fuel:0,
+        food:0,
+        toll:0,
+        platform:0,
+        other:0
       };
     }
   }
 
   trips.forEach(t=>{
     agregarMes(t.date);
-    const mes=String(t.date||'').slice(0,7);
-    if(meses[mes]){
-      meses[mes].ingresos += Number(t.price||0);
+    const clave=String(t.date||'').slice(0,7);
+
+    if(meses[clave]){
+      meses[clave].ingresos += Number(t.price||0);
     }
   });
 
   expenses.forEach(e=>{
     agregarMes(e.date);
 
-    const mes=String(e.date||'').slice(0,7);
-    if(!meses[mes]) return;
+    const clave=String(e.date||'').slice(0,7);
+    if(!meses[clave]) return;
 
     const monto=Number(e.amount||0);
     const tipo=String(e.type||'').toLowerCase();
 
-    meses[mes].gastos += monto;
+    meses[clave].gastos += monto;
 
     if(tipo.includes('combust')){
-      meses[mes].fuel += monto;
+      meses[clave].fuel += monto;
     }else if(tipo.includes('comida')){
-      meses[mes].food += monto;
-    }else if(tipo.includes('peaje') || tipo.includes('corredor')){
-      meses[mes].toll += monto;
-    }else if(tipo.includes('plataforma') || tipo.includes('indriver')){
-      meses[mes].platform += monto;
+      meses[clave].food += monto;
+    }else if(
+      tipo.includes('peaje') ||
+      tipo.includes('corredor')
+    ){
+      meses[clave].toll += monto;
+    }else if(
+      tipo.includes('plataforma') ||
+      tipo.includes('indriver')
+    ){
+      meses[clave].platform += monto;
     }else{
-      meses[mes].other += monto;
+      meses[clave].other += monto;
     }
   });
 
@@ -1839,7 +1846,7 @@ function renderHistory(){
     'SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'
   ];
 
-  const resumenMensual = Object.keys(meses)
+  const resumenMensual=Object.keys(meses)
     .sort((a,b)=>b.localeCompare(a))
     .map(clave=>{
 
@@ -1855,10 +1862,22 @@ function renderHistory(){
         ['Otros',m.other]
       ].sort((a,b)=>b[1]-a[1])[0];
 
-      return `
-        <div class="item" style="margin-bottom:16px">
+      const estado = resultado>=0
+        ? '🟢 GANANCIA DEL MES: +'+money(resultado)
+        : '🔴 PÉRDIDA DEL MES: '+money(resultado);
 
-          <h3 style="margin-bottom:14px">
+      const color = resultado>=0
+        ? '#0f9d58'
+        : '#dc2626';
+
+      const fondo = resultado>=0
+        ? '#eaf8ef'
+        : '#fdecec';
+
+      return `
+        <div class="card" style="margin-bottom:18px">
+
+          <h3 style="margin:0 0 14px">
             📅 ${nombresMeses[Number(numeroMes)-1]} ${anio}
           </h3>
 
@@ -1874,14 +1893,28 @@ function renderHistory(){
 
           <div class="row">
             <span>Resultado del mes</span>
-            <strong style="color:${resultado>=0?'#0f9d58':'#dc2626'}">
+            <strong style="color:${color}">
               ${resultado>=0?'+':''}${money(resultado)}
             </strong>
           </div>
 
-          <hr>
+          <div style="
+            margin-top:14px;
+            padding:12px;
+            border-radius:12px;
+            text-align:center;
+            font-weight:800;
+            background:${fondo};
+            color:${color};
+          ">
+            ${estado}
+          </div>
 
-          <div class="small"><strong>GASTOS DEL MES</strong></div>
+          <hr style="margin:18px 0;border:0;border-top:1px solid #e5e7eb">
+
+          <div class="small">
+            <strong>GASTOS DEL MES</strong>
+          </div>
 
           <div class="row">
             <span>⛽ Combustible</span>
@@ -1908,14 +1941,16 @@ function renderHistory(){
             <strong>${money(m.other)}</strong>
           </div>
 
-          <hr>
+          <hr style="margin:18px 0;border:0;border-top:1px solid #e5e7eb">
 
           <div class="row">
             <span>Mayor gasto</span>
             <strong style="color:#dc2626">
-              ${mayor && mayor[1]>0
-                ? mayor[0]+' '+money(mayor[1])
-                : 'Sin gastos'}
+              ${
+                mayor && mayor[1]>0
+                  ? mayor[0]+' '+money(mayor[1])
+                  : 'Sin gastos'
+              }
             </strong>
           </div>
 
@@ -1923,15 +1958,12 @@ function renderHistory(){
       `;
     }).join('');
 
-  document.getElementById('historyList').innerHTML=resumenMensual;
+  document.getElementById('historyList').innerHTML =
+    resumenMensual ||
+    '<div class="empty">Todavía no hay movimientos registrados.</div>';
 
   return;
- }
-  const list=document.getElementById('historyList');
-
-  const ft=trips
-  .filter(t=>inRange(t.date,currentFilter))
-  .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+}
     
   const fe=expenses.filter(e=>inRange(e.date,currentFilter));
 const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
