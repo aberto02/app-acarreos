@@ -1776,16 +1776,18 @@ function editExpense(id){
   
 
 function setFilter(btn){
+ 
   currentFilter=btn.dataset.filter;
+ 
+  document.querySelectorAll('.filters button').forEach(b=>b.classList.toggle('active',b===btn));
+  renderHistory();
+}
+function renderHistory(){
  const summaryCard=document.getElementById('historySummaryCard');
 if(summaryCard){
   summaryCard.style.display =
     currentFilter === 'month' ? 'none' : 'block';
 }
-  document.querySelectorAll('.filters button').forEach(b=>b.classList.toggle('active',b===btn));
-  renderHistory();
-}
-function renderHistory(){
  if(currentFilter === 'month'){
   const meses = {};
 
