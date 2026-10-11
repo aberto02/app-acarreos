@@ -1784,7 +1784,13 @@ function renderHistory(){
   const list=document.getElementById('historyList');
 
   const ft=trips
-    const resultado = income - out;
+    
+  const fe=expenses.filter(e=>inRange(e.date,currentFilter));
+const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
+  const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
+ 
+ const out=fe.reduce((s,e)=>s+Number(e.amount||0),0);
+ const resultado = income - out;
 
 histIncome.textContent = money(income);
 histExpense.textContent = money(out);
@@ -1818,9 +1824,6 @@ if(currentFilter === 'month'){
   histProfit.style.color = resultado < 0 ? '#dc2626' : '#0f9d58';
   monthStatus.style.display = 'none';
 }
-  const fe=expenses.filter(e=>inRange(e.date,currentFilter));
-const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
-  const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
   const out=fe.reduce((s,e)=>s+Number(e.amount||0),0);
 
   histIncome.textContent=money(income);
