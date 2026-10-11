@@ -743,7 +743,7 @@ nav{
     <button data-filter="week" onclick="setFilter(this)">7 días</button>
     <button data-filter="month" onclick="setFilter(this)">Mes</button>
   </div>
- <div class="card" style="margin-top:10px">
+ <div id="historySummaryCard" class="card" style="margin-top:10px">
   <div class="row"><span>Ingresos</span><strong id="histIncome">$0.00</strong></div>
   <div class="row"><span>Gastos totales</span><strong id="histExpense">$0.00</strong></div>
   <div class="row">
@@ -1777,6 +1777,11 @@ function editExpense(id){
 
 function setFilter(btn){
   currentFilter=btn.dataset.filter;
+ const summaryCard=document.getElementById('historySummaryCard');
+if(summaryCard){
+  summaryCard.style.display =
+    currentFilter === 'month' ? 'none' : 'block';
+}
   document.querySelectorAll('.filters button').forEach(b=>b.classList.toggle('active',b===btn));
   renderHistory();
 }
