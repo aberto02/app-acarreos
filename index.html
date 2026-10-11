@@ -1927,7 +1927,8 @@ const perdidaDias=m.diasPerdida || 0;
         : '#fdecec';
 
       return `
-        <details class="card" open="false" style="margin-bottom...
+        
+  <details class="card" style="margin-bottom:18px;">
   <summary style="
     cursor:pointer;
     font-size:22px;
@@ -1937,22 +1938,24 @@ const perdidaDias=m.diasPerdida || 0;
     📅 ${nombresMeses[Number(numeroMes)-1]} ${anio}
   </summary>
 
-  <div style="margin-top:18px">
-  <div class="row">
-  <span>🚚 Viajes realizados</span>
-  <strong>${viajesMes}</strong>
-</div>
+  <div style="margin-top:18px;">
 
-<div class="row">
-  <span>🟢 Días con ganancia</span>
-  <strong style="color:#0f9d58">${gananciaDias}</strong>
-</div>
+    <div class="row">
+      <span>🚚 Viajes realizados</span>
+      <strong>${viajesMes}</strong>
+    </div>
 
-<div class="row">
-  <span>🔴 Días con pérdida</span>
-  <strong style="color:#dc2626">${perdidaDias}</strong>
-</div>
+    <div class="row">
+      <span>🟢 Días con ganancia</span>
+      <strong style="color:#0f9d58">${gananciaDias}</strong>
+    </div>
 
+    <div class="row">
+      <span>🔴 Días con pérdida</span>
+      <strong style="color:#dc2626">${perdidaDias}</strong>
+    </div>
+
+    <hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
 <hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
 
     <div class="row">
