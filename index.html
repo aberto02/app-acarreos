@@ -746,7 +746,14 @@ nav{
  <div class="card" style="margin-top:10px">
   <div class="row"><span>Ingresos</span><strong id="histIncome">$0.00</strong></div>
   <div class="row"><span>Gastos totales</span><strong id="histExpense">$0.00</strong></div>
-  <div class="row"><span>Ganancia</span><strong class="success" id="histProfit">$0.00</strong></div>
+  <div class="row">
+  <span id="histResultLabel">Resultado</span>
+  <strong id="histProfit">$0.00</strong>
+</div>
+
+<div id="histMonthStatus"
+     style="margin-top:12px;padding:12px;border-radius:12px;text-align:center;font-weight:800;display:none">
+</div>
 
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
   <div class="small" style="font-weight:800;margin-bottom:6px">KILOMETRAJE DEL PERÍODO</div>
@@ -1777,9 +1784,40 @@ function renderHistory(){
   const list=document.getElementById('historyList');
 
   const ft=trips
-    .filter(t=>inRange(t.date,currentFilter))
-    .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    const resultado = income - out;
 
+histIncome.textContent = money(income);
+histExpense.textContent = money(out);
+histProfit.textContent = money(resultado);
+
+const resultLabel = document.getElementById('histResultLabel');
+const monthStatus = document.getElementById('histMonthStatus');
+
+if(currentFilter === 'month'){
+  resultLabel.textContent = 'Resultado del mes';
+
+  if(resultado >= 0){
+    histProfit.textContent = '+' + money(resultado);
+    histProfit.style.color = '#0f9d58';
+
+    monthStatus.style.display = 'block';
+    monthStatus.style.background = '#eaf8ef';
+    monthStatus.style.color = '#0f9d58';
+    monthStatus.textContent = '🟢 GANANCIA DEL MES: +' + money(resultado);
+  }else{
+    histProfit.textContent = money(resultado);
+    histProfit.style.color = '#dc2626';
+
+    monthStatus.style.display = 'block';
+    monthStatus.style.background = '#fdecec';
+    monthStatus.style.color = '#dc2626';
+    monthStatus.textContent = '🔴 PÉRDIDA DEL MES: ' + money(resultado);
+  }
+}else{
+  resultLabel.textContent = 'Ganancia';
+  histProfit.style.color = resultado < 0 ? '#dc2626' : '#0f9d58';
+  monthStatus.style.display = 'none';
+}
   const fe=expenses.filter(e=>inRange(e.date,currentFilter));
 const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
   const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
