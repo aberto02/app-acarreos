@@ -1553,6 +1553,16 @@ function removeBatchTrip(btn){
   btn.closest('.trip-batch-item').remove();
   renumberBatchTrips();
 }
+ function updateDayStatus(){
+  const status=document.getElementById('dayStatus').value;
+  const list=document.getElementById('tripBatchList');
+
+  if(status==='trips'){
+    list.style.display='';
+  }else{
+    list.style.display='none';
+  }
+ }
 
 document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
