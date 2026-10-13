@@ -1874,7 +1874,7 @@ diasLibres:0,
 
     if(meses[clave]){
   meses[clave].ingresos += Number(t.price || 0);
-  meses[clave].viajes++;
+  if(!t.dayStatus || t.dayStatus === 'trips') meses[clave].viajes++;
  }
   });
 
