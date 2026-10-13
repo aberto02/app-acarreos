@@ -1199,7 +1199,7 @@ function renderDashboard(){
   const sameMonth = (d) => String(d || '').slice(0, 7) === monthKey;
   const getAmount = (x) => Number(x.amount ?? x.price ?? x.total ?? 0);
 
-  const todayTrips = trips.filter(t => sameDay(t.date));
+  const todayTrips = trips.filter(t => sameDay(t.date) && (!t.dayStatus || t.dayStatus === 'trips'));
   const todayExpenses = expenses.filter(e => sameDay(e.date));
   const income = todayTrips.reduce((s, t) => s + getAmount(t), 0);
   const out = todayExpenses.reduce((s, e) => s + getAmount(e), 0);
@@ -1209,7 +1209,7 @@ function renderDashboard(){
   document.getElementById('kpiGastos').textContent = '$' + out.toFixed(2);
   document.getElementById('kpiGanancia').textContent = '$' + (income - out).toFixed(2);
 
-  const monthTrips = trips.filter(t => sameMonth(t.date));
+  const monthTrips = trips.filter(t => sameMonth(t.date) && (!t.dayStatus || t.dayStatus === 'trips'));
   const monthExpenses = expenses.filter(e => sameMonth(e.date));
   const mi = monthTrips.reduce((s, t) => s + getAmount(t), 0);
   const me = monthExpenses.reduce((s, e) => s + getAmount(e), 0);
