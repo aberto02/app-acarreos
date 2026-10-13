@@ -1551,19 +1551,19 @@ function removeBatchTrip(btn){
   }
 
   btn.closest('.trip-batch-item').remove();
-  renumberBatchTrips();
+  renumberBatchTrips()
+ 
+function updateDayStatus(){
+  const status = document.getElementById('dayStatus').value;
+  const list = document.getElementById('tripBatchList');
+  const sinAcarreos = status !== 'trips';
+
+  list.style.display = sinAcarreos ? 'none' : '';
+
+  list.querySelectorAll('input, select, textarea, button').forEach(el => {
+    el.disabled = sinAcarreos;
+  });
 }
- function updateDayStatus(){
-  const status=document.getElementById('dayStatus').value;
-  const list=document.getElementById('tripBatchList');
-
-  if(status==='trips'){
-    list.style.display='';
-  }else{
-    list.style.display='none';
-  }
- }
-
 document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
 
