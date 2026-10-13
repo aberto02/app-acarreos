@@ -478,8 +478,16 @@ nav{
     <form id="tripForm">
 
       <label>Fecha del día
+       
         <input type="date" id="tripDate" required>
       </label>
+     <label>Estado del día
+  <select id="dayStatus" onchange="updateDayStatus()">
+    <option value="trips">🚚 Con acarreos</option>
+    <option value="no-trips">🟠 Salí / Sin acarreos</option>
+    <option value="off">🏠 Día libre</option>
+  </select>
+     </label>
 
       <div id="tripBatchList">
 
