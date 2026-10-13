@@ -1568,6 +1568,42 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
 
   const fecha=document.getElementById('tripDate').value;
+   const dayStatus=document.getElementById('dayStatus').value;
+
+  if(dayStatus!=='trips'){
+    const registro={
+      id:crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now()+Math.random()),
+      date:fecha,
+      dayStatus:dayStatus,
+      client:dayStatus==='no-trips'
+        ? 'Sin acarreos'
+        : 'Día libre',
+      phone:'',
+      from:'',
+      to:'',
+      cargo:'',
+      helper:0,
+      price:0,
+      km:0,
+      pay:'',
+      notes:''
+    };
+
+    trips.push(registro);
+    save();
+    renderHistory();
+    renderDashboard();
+    populateTripOptions();
+
+    toast(
+      dayStatus==='no-trips'
+        ? 'Día sin acarreos guardado'
+        : 'Día libre guardado'
+    );
+    return;
+ }
 
   const items=[
     ...document.querySelectorAll(
