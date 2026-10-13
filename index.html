@@ -2266,8 +2266,17 @@ document.getElementById('histFuelPerKm').textContent=
 
   list.innerHTML=fechas.map(fecha=>{
 
-    const viajesDia=ft.filter(
-      t=>String(t.date||'').slice(0,10)===fecha
+ const registrosDia=ft.filter(
+  t=>String(t.date||'').slice(0,10)===fecha
+);
+
+const estadoDia=registrosDia.find(
+  t=>t.dayStatus==='no-trips' || t.dayStatus==='off'
+);
+
+const viajesDia=registrosDia.filter(
+  t=>!t.dayStatus || t.dayStatus==='trips'
+);
     );
 
     const gastosDia=fe.filter(
