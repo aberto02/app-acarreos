@@ -1561,14 +1561,14 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
 
   const items=[
     ...document.querySelectorAll(
-      '#tripBatchList .trip-batch-item'
+            '#tripBatchList .trip-batch-item'
     )
   ];
 
   const nuevos=items.map(item=>({
-    id:crypto.randomUUID
-      ? crypto.randomUUID()
-      : String(Date.now()+Math.random()),
+   id:crypto.randomUUID
+  ? crypto.randomUUID()
+  : String(Date.now()+Math.random()),
 
     date:fecha,
 
