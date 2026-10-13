@@ -1912,7 +1912,17 @@ trips.forEach(t=>{
   if(!fecha) return;
 
   if(!dias[fecha]){
-    dias[fecha] = { ingresos:0, gastos:0 };
+    dias[fecha] = {
+      ingresos:0,
+      gastos:0,
+      dayStatus:'trips'
+    };
+  }
+
+  if(t.dayStatus === 'no-trips'){
+    dias[fecha].dayStatus = 'no-trips';
+  }else if(t.dayStatus === 'off'){
+    dias[fecha].dayStatus = 'off';
   }
 
   dias[fecha].ingresos += Number(t.price || 0);
@@ -1923,7 +1933,7 @@ expenses.forEach(e=>{
   if(!fecha) return;
 
   if(!dias[fecha]){
-    dias[fecha] = { ingresos:0, gastos:0 };
+    dias[fecha] = { ingresos:0, gastos:0, dayStatus:'trips' };
   }
 
   dias[fecha].gastos += Number(e.amount || 0);
@@ -1936,10 +1946,14 @@ Object.keys(dias).forEach(fecha=>{
   const resultadoDia =
     dias[fecha].ingresos - dias[fecha].gastos;
 
-  if(resultadoDia > 0){
-    meses[clave].diasGanancia++;
-  }else if(resultadoDia < 0){
-    meses[clave].diasPerdida++;
+  if(dias[fecha].dayStatus === 'no-trips'){
+  meses[clave].diasSinAcarreos++;
+}else if(dias[fecha].dayStatus === 'off'){
+  meses[clave].diasLibres++;
+}else if(resultadoDia > 0){
+  meses[clave].diasGanancia++;
+}else if(resultadoDia < 0){
+  meses[clave].diasPerdida++;
   }
 });
 
@@ -1959,6 +1973,8 @@ Object.keys(dias).forEach(fecha=>{
      const viajesMes=m.viajes || 0;
 const gananciaDias=m.diasGanancia || 0;
 const perdidaDias=m.diasPerdida || 0;
+     const sinAcarreosDias=m.diasSinAcarreos || 0;
+const libresDias=m.diasLibres || 0;
 
       const mayor=[
         ['Combustible',m.fuel],
@@ -2000,7 +2016,7 @@ const perdidaDias=m.diasPerdida || 0;
     </div>
     <div class="row">
   <span>📅 Días trabajados</span>
-  <strong>${gananciaDias + perdidaDias}</strong>
+  <strong>${gananciaDias + perdidaDias + sinAcarreosDias}</strong>
 </div>
 
     <div class="row">
@@ -2012,9 +2028,17 @@ const perdidaDias=m.diasPerdida || 0;
       <span>🔴 Días con pérdida</span>
       <strong style="color:#dc2626">${perdidaDias}</strong>
     </div>
+<div class="row">
+  <span>🟠 Salí / Sin acarreos</span>
+  <strong>${sinAcarreosDias}</strong>
+</div>
 
+<div class="row">
+  <span>🏠 Días libres</span>
+  <strong>${libresDias}</strong>
+</div>
     <hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
-<hr style="margin:18px 0;border:0;border-top:1px solid #ddd">
+
 
     <div class="row">
       <span>Ingresos</span>
