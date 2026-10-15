@@ -2274,7 +2274,11 @@ document.getElementById('histFuelPerKm').textContent=
 const estadoDia=registrosDia.find(
   t=>t.dayStatus==='no-trips' || t.dayStatus==='off'
 );
-
+const estadoTexto = estadoDia
+  ? (estadoDia.dayStatus === 'off'
+      ? '🏠 Día libre'
+      : '🚚 Salí / Sin acarreo')
+  : '';
 const viajesDia=registrosDia.filter(
   t=>!t.dayStatus || t.dayStatus==='trips'
 );
