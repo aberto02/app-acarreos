@@ -1562,8 +1562,15 @@ function updateDayStatus(){
   list.style.display = sinAcarreos ? 'none' : '';
 
   list.querySelectorAll('input, select, textarea, button').forEach(el => {
-    el.disabled = sinAcarreos;
-  });
+  el.disabled = sinAcarreos;
+  if (sinAcarreos) {
+    el.dataset.wasRequired = el.required ? '1' : '0';
+    el.required = false;
+  } else if (el.dataset.wasRequired === '1') {
+    el.required = true;
+  }
+});
+    
 }
 document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
