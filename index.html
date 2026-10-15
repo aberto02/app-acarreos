@@ -2394,6 +2394,7 @@ const profit=Number(t.price||0)-ge;
     <div class="drawer-summary">
       <div class="drawer-main">
         <div class="drawer-title">📅 ${esc(fecha)}</div>
+        ${estadoTexto ? `<div class="small" style="font-weight:800;margin-top:4px">${estadoTexto}</div>` : ''}
 
         <div class="drawer-numbers">
           ${viajesDia.length} acarreo${viajesDia.length===1?'':'s'}
