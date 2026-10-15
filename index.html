@@ -1573,7 +1573,7 @@ function updateDayStatus(){
 });
     
 }
-document.getElementById('tripForm').onsubmit=(e)=>{
+document.getElementById('tripForm').addEventListener('submit',e=>{
   e.preventDefault();
 
   const fecha=document.getElementById('tripDate').value;
@@ -1680,7 +1680,7 @@ document.getElementById('tripForm').onsubmit=(e)=>{
       ? ' acarreo guardado'
       : ' acarreos guardados')
   );
-};
+});
 
 function updateExpenseBatchTotal(){
 
