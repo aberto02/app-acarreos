@@ -2130,10 +2130,11 @@ const libresDias=m.diasLibres || 0;
     resumenMensual ||
     '<div class="empty">Todavía no hay movimientos registrados.</div>';
 
-  return;
+  
 }
     
-  const fe=expenses.filter(e=>inRange(e.date,currentFilter));
+ 
+ const ft=trips.filter(t=>inRange(t.date,currentFilter));const fe=expenses.filter(e=>inRange(e.date,currentFilter));
 const fo=odometerRecords.filter(r=>inRange(String(r.date||'').slice(0,10),currentFilter));
   const income=ft.reduce((s,t)=>s+Number(t.price||0),0);
  
