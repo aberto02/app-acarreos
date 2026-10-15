@@ -1573,7 +1573,7 @@ function updateDayStatus(){
 });
     
 }
-document.getElementById('tripForm').addEventListener('submit',e=>{
+document.getElementById('tripForm').onsubmit=(e)=>{
   e.preventDefault();
 
   const fecha=document.getElementById('tripDate').value;
