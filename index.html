@@ -629,7 +629,7 @@ nav{
 
       <button
         class="btn-primary"
-        type="button" onclick="document.getElementById('tripForm').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))"
+        type="submit"
         style="width:100%;margin-top:12px">
         💾 Guardar todos los acarreos
       </button>
@@ -1581,9 +1581,7 @@ document.getElementById('tripForm').addEventListener('submit',e=>{
 
   if(dayStatus!=='trips'){
     const registro={
-      id:crypto.randomUUID
-        ? crypto.randomUUID()
-        : String(Date.now()+Math.random()),
+      id:String(Date.now())+'-'+Math.random(),
       date:fecha,
       dayStatus:dayStatus,
       client:dayStatus==='no-trips'
