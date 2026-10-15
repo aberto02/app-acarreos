@@ -629,7 +629,7 @@ nav{
 
       <button
         class="btn-primary"
-        type="submit"
+        type="button" onclick="document.getElementById('tripForm').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))"
         style="width:100%;margin-top:12px">
         💾 Guardar todos los acarreos
       </button>
