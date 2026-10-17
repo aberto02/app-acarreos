@@ -1835,6 +1835,9 @@ function renderExpenses(){
         <button class="btn-secondary" onclick="editExpense('${e.id}')">
           Editar / vincular
         </button>
+        <button class="btn-secondary" onclick="deleteExpense('${e.id}')">
+  🗑️ Borrar
+</button>
       </div>
     </div>`;
   }).join('') : '<div class="empty">Todavía no hay gastos registrados.</div>';
@@ -1854,6 +1857,18 @@ function editExpense(id){
   window.scrollTo({top:0,behavior:'smooth'});
   toast('Elige el acarreo y pulsa Guardar gasto');
 }
+ function deleteExpense(id){
+  if(!confirm('¿Seguro que quieres borrar este gasto?')) return;
+
+  expenses = expenses.filter(e => String(e.id) !== String(id));
+
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+
+  renderExpenseRecords();
+  renderHistory();
+
+  toast('Gasto borrado');
+ }
   
   
   
