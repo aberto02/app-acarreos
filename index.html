@@ -1847,15 +1847,34 @@ function editExpense(id){
   const e=expenses.find(x=>String(x.id)===String(id));
   if(!e) return;
 
+  document.getElementById('expenseDate').value=e.date||todayStr();
+  document.getElementById('expenseTrip').value=e.tripId||'';
+  document.getElementById('expenseNote').value=e.note||'';
+
+  const campos={
+    'Combustible':'expenseFuel',
+    'Comida':'expenseFood',
+    'Corredor / Peaje':'expenseToll',
+    'Plataforma / InDriver':'expensePlatform',
+    'Mantenimiento':'expenseMaintenance',
+    'Cuota pickup':'expensePickup',
+    'Otro':'expenseOther'
+  };
+
+  Object.values(campos).forEach(campo=>{
+    document.getElementById(campo).value='';
+  });
+
+  const campo=campos[e.type];
+  if(campo){
+    document.getElementById(campo).value=e.amount||'';
+  }
+
   editingExpenseId=String(id);
-  expenseDate.value=e.date||todayStr();
-  expenseType.value=e.type||'Otro';
-  expenseAmount.value=e.amount||0;
-  expenseTrip.value=e.tripId||'';
-  expenseNote.value=e.note||'';
+  updateExpenseBatchTotal();
 
   window.scrollTo({top:0,behavior:'smooth'});
-  toast('Elige el acarreo y pulsa Guardar gasto');
+  toast('Edita el gasto y pulsa Guardar gasto');
 }
  function deleteExpense(id){
   if(!confirm('¿Seguro que quieres borrar este gasto?')) return;
