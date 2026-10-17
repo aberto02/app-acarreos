@@ -1182,6 +1182,7 @@ function go(page){
   renderExpenseRecords();
  }
   if(page==='nuevo') refreshTripSuggestions();
+ document.getElementById(page).classList.add('active');
   if(page==='historial') renderHistory();
   if(page==='clientes') renderClients();
   window.scrollTo({top:0,behavior:'smooth'});
