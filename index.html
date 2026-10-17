@@ -1754,6 +1754,7 @@ const note=document.getElementById('expenseNote').value.trim();
   save();
   renderDashboard();
   populateTripOptions();
+ renderExpenseRecords();
  
 
   [
@@ -1778,7 +1779,27 @@ const note=document.getElementById('expenseNote').value.trim();
   );
 });
 
-    
+function renderExpenseRecords(){
+  const list = document.getElementById('expenseRecordsList');
+  if(!list) return;
+
+  const sorted = [...expenses].sort((a,b)=>
+    String(b.date || '').localeCompare(String(a.date || ''))
+  );
+
+  if(!sorted.length){
+    list.innerHTML = '<p style="color:#6b7280;">No hay gastos registrados.</p>';
+    return;
+  }
+
+  list.innerHTML = sorted.map(e => `
+    <div style="padding:12px 0;border-bottom:1px solid #ddd;">
+      <strong>📅 ${e.date || 'Sin fecha'}</strong><br>
+      ${e.type || 'Otro'} — <strong>${money(Number(e.amount || 0))}</strong>
+      ${e.note ? `<br><small>📝 ${e.note}</small>` : ''}
+    </div>
+  `).join('');
+ }    
 
 function renderExpenses(){
   const list=document.getElementById('expenseList');
