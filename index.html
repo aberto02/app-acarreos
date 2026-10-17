@@ -1818,9 +1818,23 @@ function renderExpenseRecords(){
       <strong>📅 ${e.date || 'Sin fecha'}</strong><br>
       ${e.type || 'Otro'} — <strong>${money(Number(e.amount || 0))}</strong>
       ${e.note ? `<br><small>📝 ${e.note}</small>` : ''}
+
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button"
+          class="btn-secondary"
+          onclick="editExpense('${e.id}')">
+          ✏️ Editar
+        </button>
+
+        <button type="button"
+          class="btn-secondary"
+          onclick="deleteExpense('${e.id}')">
+          🗑️ Borrar
+        </button>
+      </div>
     </div>
   `).join('');
- }    
+ }
 
 function renderExpenses(){
   const list=document.getElementById('expenseList');
