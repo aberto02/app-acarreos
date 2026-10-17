@@ -3140,10 +3140,12 @@ function importData(ev){
   r.readAsText(file);
 }
 tripDate.value=todayStr();
+ 
 expenseDate.value=todayStr();
 renderDashboard();
   renderOdometer();
 populateTripOptions();
+ renderExpenseRecords();
 </script>
 </body>
 </html>
