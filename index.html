@@ -1705,9 +1705,9 @@ function updateExpenseBatchTotal(){
 document.getElementById('expenseForm').addEventListener('submit',e=>{
   e.preventDefault();
 
-  const fecha=expenseDate.value;
-  const tripId=expenseTrip.value;
-  const note=expenseNote.value.trim();
+  const fecha=document.getElementById('expenseDate').value;
+const tripId=document.getElementById('expenseTrip').value;
+const note=document.getElementById('expenseNote').value.trim();
 
   const datos=[
     ['Combustible','expenseFuel'],
