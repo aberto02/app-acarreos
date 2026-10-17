@@ -2010,6 +2010,41 @@ Object.keys(dias).forEach(fecha=>{
      const viajesMes=m.viajes || 0;
 const gananciaDias=m.diasGanancia || 0;
 const perdidaDias=m.diasPerdida || 0;
+     const detalleDias = Object.keys(dias)
+  .filter(fecha => fecha.slice(0,7) === clave)
+  .sort((a,b) => b.localeCompare(a))
+  .map(fecha => {
+    const d = dias[fecha];
+    const resultadoDia = d.ingresos - d.gastos;
+
+    return `
+      <details style="
+        margin:10px 0;
+        padding:12px;
+        border:1px solid #ddd;
+        border-radius:12px;
+        background:#fff;
+      ">
+        <summary style="cursor:pointer;font-weight:700;">
+          📅 ${fecha} — 
+          <span style="color:${resultadoDia >= 0 ? '#0f9d58' : '#dc2626'}">
+            ${resultadoDia >= 0 ? '+' : ''}${money(resultadoDia)}
+          </span>
+        </summary>
+
+        <div style="margin-top:10px;">
+          <div class="row"><span>💵 Ingresos</span><strong>${money(d.ingresos)}</strong></div>
+          <div class="row"><span>💸 Gastos</span><strong>${money(d.gastos)}</strong></div>
+          <div class="row"><span>⛽ Combustible</span><strong>${money(d.fuel || 0)}</strong></div>
+          <div class="row"><span>🍽️ Comida</span><strong>${money(d.food || 0)}</strong></div>
+          <div class="row"><span>🛣️ Peaje</span><strong>${money(d.toll || 0)}</strong></div>
+          <div class="row"><span>📱 Plataforma</span><strong>${money(d.platform || 0)}</strong></div>
+          <div class="row"><span>📦 Otros</span><strong>${money(d.other || 0)}</strong></div>
+        </div>
+      </details>
+    `;
+  })
+  .join('');
      const sinAcarreosDias=m.diasSinAcarreos || 0;
 const libresDias=m.diasLibres || 0;
 
