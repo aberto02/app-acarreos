@@ -2110,6 +2110,14 @@ const perdidaDias=m.diasPerdida || 0;
   .map(fecha => {
     const d = dias[fecha];
     const resultadoDia = d.ingresos - d.gastos;
+   const odoDia = odometerRecords.find(r =>
+  String(r.date || '').slice(0,10) === fecha
+);
+const kmInicial = odoDia ? Number(odoDia.startKm ?? odoDia.start ?? 0) : 0;
+const kmFinal = odoDia ? Number(odoDia.finalKm ?? odoDia.final ?? 0) : 0;
+const kmRecorridos = kmFinal >= kmInicial && kmInicial > 0
+  ? kmFinal - kmInicial
+  : 0;
 
     return `
       <details style="
@@ -2135,6 +2143,9 @@ const perdidaDias=m.diasPerdida || 0;
           <div class="row"><span>📱 Plataforma</span><strong>${money(d.platform || 0)}</strong></div>
           <div class="row"><span>📦 Otros</span><strong>${money(d.other || 0)}</strong></div>
         </div>
+        <div class="row"><span>🚘 Km inicial</span><strong>${kmInicial ? kmInicial.toLocaleString() : '—'}</strong></div>
+<div class="row"><span>🏁 Km final</span><strong>${kmFinal ? kmFinal.toLocaleString() : '—'}</strong></div>
+<div class="row"><span>🛣️ Km recorridos</span><strong>${kmRecorridos.toLocaleString()} km</strong></div>
       </details>
     `;
   })
