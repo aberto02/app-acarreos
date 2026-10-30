@@ -1168,6 +1168,62 @@ function saveOdometer(){
     toast('Kilometraje del día guardado');
   }
 }
+ function editOdometerByDate(date){
+  const record = odometerRecords.find(
+    r => String(r.date || '') === date
+  );
+
+  if(!record){
+    alert('No hay registro de kilometraje para esta fecha.');
+    return;
+  }
+
+  const startActual = Number(record.startKm || 0);
+  const finalActual = recordFinalKm(record);
+
+  const nuevoInicial = prompt(
+    'Km inicial de ' + date + ':',
+    startActual || ''
+  );
+
+  if(nuevoInicial === null) return;
+
+  const nuevoFinal = prompt(
+    'Km final de ' + date + ':',
+    finalActual !== null ? finalActual : ''
+  );
+
+  if(nuevoFinal === null) return;
+
+  const startKm = Number(nuevoInicial);
+  const finalKm = Number(nuevoFinal);
+
+  if(
+    !Number.isFinite(startKm) ||
+    startKm <= 0 ||
+    !Number.isFinite(finalKm) ||
+    finalKm <= 0
+  ){
+    alert('Revisa los kilometrajes.');
+    return;
+  }
+
+  if(finalKm < startKm){
+    alert('El kilometraje final no puede ser menor al inicial.');
+    return;
+  }
+
+  record.startKm = startKm;
+  record.finalKm = finalKm;
+  record.km = finalKm;
+
+  save();
+  renderHistory();
+  renderDashboard();
+  renderOdometer();
+
+  toast('Kilometraje actualizado');
+ }
 function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block';
   setTimeout(()=>el.style.display='none',1800);
@@ -2146,6 +2202,14 @@ const kmRecorridos = kmFinal >= kmInicial && kmInicial > 0
         <div class="row"><span>🚘 Km inicial</span><strong>${kmInicial ? kmInicial.toLocaleString() : '—'}</strong></div>
 <div class="row"><span>🏁 Km final</span><strong>${kmFinal ? kmFinal.toLocaleString() : '—'}</strong></div>
 <div class="row"><span>🛣️ Km recorridos</span><strong>${kmRecorridos.toLocaleString()} km</strong></div>
+<div style="margin-top:10px;">
+  <button
+    type="button"
+    class="btn-secondary"
+    onclick="editOdometerByDate('${d}')">
+    ✏️ Editar kilometraje
+  </button>
+</div>
       </details>
     `;
   })
