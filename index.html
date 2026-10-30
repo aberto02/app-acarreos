@@ -1169,13 +1169,17 @@ function saveOdometer(){
   }
 }
  function editOdometerByDate(date){
-  const record = odometerRecords.find(
+  let record = odometerRecords.find(
     r => String(r.date || '') === date
   );
 
   if(!record){
-    alert('No hay registro de kilometraje para esta fecha.');
-    return;
+  record = {
+    date: date,
+    startKm: 0,
+    finalKm: null
+  };
+  odometerRecords.push(record);
   }
 
   const startActual = Number(record.startKm || 0);
