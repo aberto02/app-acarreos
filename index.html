@@ -3421,7 +3421,7 @@ let maintRecords = JSON.parse(
   localStorage.getItem(KEY_MAINT_RECORDS) || '[]'
 );
 let editingMaintId = null;
- renderDashboard();
+ 
 
 function saveMaintRecords() {
   localStorage.setItem(
@@ -3511,12 +3511,13 @@ document.getElementById('maintenanceRecordForm')
     editingMaintId = null;
     saveMaintRecords();
     renderMaintRecords();
+   renderDashboard();
     this.reset();
     alert('Mantenimiento guardado');
   });
 
 renderMaintRecords();
- 
+ renderDashboard();
 </script>
 </body>
 </html>
