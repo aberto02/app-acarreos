@@ -3411,7 +3411,7 @@ toast('Respaldo importado');
 tripDate.value=todayStr();
  
 expenseDate.value=todayStr();
-renderDashboard();
+
   renderOdometer();
 populateTripOptions();
  renderExpenseRecords();
@@ -3421,6 +3421,7 @@ let maintRecords = JSON.parse(
   localStorage.getItem(KEY_MAINT_RECORDS) || '[]'
 );
 let editingMaintId = null;
+ renderDashboard();
 
 function saveMaintRecords() {
   localStorage.setItem(
