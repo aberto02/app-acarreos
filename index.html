@@ -1326,9 +1326,21 @@ const mantenimientoMes = maintRecords
   .filter(r => sameMonth(r.date))
   .reduce((s, r) => s + Number(r.cost || 0), 0);
 
+
+const recuperacionLlantas = maintRecords
+  .filter(r => sameMonth(r.date) && r.type === 'Llantas')
+  .reduce((s, r) => {
+    const venta = String(r.notes || '').match(
+      /Venta de las 4 llantas usadas por \$\s*(\d+(?:\.\d+)?)/i
+    );
+    return s + (venta ? Number(venta[1]) : 0);
+  }, 0);
+
 const me = monthExpenses.reduce(
   (s, e) => s + getAmount(e), 0
-) + mantenimientoMes;
+) + mantenimientoMes - recuperacionLlantas;
+ 
+ 
  
 
   document.getElementById('mesViajes').textContent = monthTrips.length;
