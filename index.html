@@ -2195,6 +2195,45 @@ const kmRecorridos = kmFinal >= kmInicial && kmInicial > 0
         </summary>
 
         <div style="margin-top:10px;">
+        
+<div style="margin-top:10px;margin-bottom:14px;">
+  <strong>🚚 Acarreos del día</strong>
+
+  ${trips
+    .filter(t =>
+      String(t.date || '').slice(0,10) === fecha &&
+      (t.dayStatus || 'trips') === 'trips'
+    )
+    .map((t,i) => `
+      <div class="row" style="
+        padding:10px 0;
+        border-bottom:1px solid #ddd;
+        gap:8px;
+      ">
+        <span>
+          🚚 Acarreo ${i+1}
+          <small style="display:block">
+            ${esc(t.client || 'Sin cliente')}
+          </small>
+        </span>
+
+        <strong>${money(Number(t.price || 0))}</strong>
+
+        <button type="button"
+          class="btn-secondary"
+          onclick='editTrip(${JSON.stringify(t.id)})'>
+          ✏️ Editar
+        </button>
+
+        <button type="button"
+          class="btn-secondary"
+          onclick='deleteTrip(${JSON.stringify(t.id)})'>
+          🗑️
+        </button>
+      </div>
+    `).join('') || '<p>Sin acarreos registrados</p>'}
+</div>
+ 
           <div class="row"><span>💵 Ingresos</span><strong>${money(d.ingresos)}</strong></div>
           <div class="row"><span>💸 Gastos</span><strong>${money(d.gastos)}</strong></div>
           <div class="row"><span>⛽ Combustible</span><strong>${money(d.fuel || 0)}</strong></div>
